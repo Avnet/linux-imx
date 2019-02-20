@@ -25,6 +25,25 @@
 		stdout-path = &uart1;
 	};
 
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		status = "okay";
+
+		sys_led {
+				label = "sys_led";
+				gpios = <&gpio1 5 0>;
+				default-state = "on";
+				linux,default-trigger = "heartbeat";
+		};
+		usr_led {
+				label = "usr_led";
+				gpios = <&gpio1 8 0>;
+				default-state = "on";
+		};
+
+	};
 };
 
 &clk {
@@ -42,7 +61,14 @@
 
 			>;
 		};
-  
+
+		pinctrl_gpio_leds: gpio_ledsgrp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_GPIO1_IO05_GPIO1_IO5                0x19
+				MX8MQ_IOMUXC_GPIO1_IO08_GPIO1_IO8                0x19
+			>;
+		};
+
 		pinctrl_uart1: uart1grp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_UART1_RXD_UART1_DCE_RX		0x49
