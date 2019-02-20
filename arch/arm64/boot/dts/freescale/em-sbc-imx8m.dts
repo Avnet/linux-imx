@@ -123,6 +123,12 @@
 			>;
 		};
 
+		pinctrl_wdog: wdoggrp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B 0xc6
+			>;
+		};
+
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_ENET_MDC_ENET1_MDC		0x3
@@ -170,6 +176,13 @@
 		1000000 900000
 		800000  900000
 	>;
+};
+
+&wdog1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog>;
+	fsl,ext-reset-output;
+	status = "okay";
 };
 
 &vpu {
