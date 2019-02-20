@@ -177,6 +177,15 @@
        status = "disable";
 };
 
+&dcss {
+	status = "okay";
+	disp-dev = "hdmi_disp";
+};
+
+&hdmi {
+	status = "okay";
+};
+
 &i2c1 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
