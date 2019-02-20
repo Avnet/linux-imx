@@ -169,6 +169,31 @@
 				MX8MQ_IOMUXC_GPIO1_IO09_GPIO1_IO9	0x19
 			>;
 		};
+
+		pinctrl_uart2: uart2grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_UART2_RXD_UART2_DCE_RX		0x49
+				MX8MQ_IOMUXC_UART2_TXD_UART2_DCE_TX		0x49
+			>;
+		};
+
+		pinctrl_uart3: uart3grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_UART3_TXD_UART3_DCE_TX		0x49
+				MX8MQ_IOMUXC_UART3_RXD_UART3_DCE_RX		0x49
+				MX8MQ_IOMUXC_ECSPI1_MISO_UART3_DCE_CTS_B	0x49
+				MX8MQ_IOMUXC_ECSPI1_SS0_UART3_DCE_RTS_B		0x49
+				MX8MQ_IOMUXC_ECSPI2_MOSI_GPIO5_IO11			0x19
+			>;
+		};
+
+		pinctrl_uart4: uart4grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_UART4_RXD_UART4_DCE_RX		0x49
+				MX8MQ_IOMUXC_UART4_TXD_UART4_DCE_TX		0x49
+			>;
+		};
+
 	};
 };
 
@@ -445,4 +470,30 @@
 			at803x,eee-disabled;
 		};
 	};
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART2>;
+	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	status = "okay";
+};
+
+/* BT */
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART3>;
+	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_80M>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART4>;
+	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	status = "okay";
 };
