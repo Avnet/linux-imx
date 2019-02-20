@@ -185,9 +185,13 @@
 	status = "okay";
 };
 
+&gpu {
+       status = "okay";
+};
+
 &vpu {
 	   /delete-property/ regulator-supply;
-       status = "disable";
+       status = "okay";
 };
 
 &dcss {
