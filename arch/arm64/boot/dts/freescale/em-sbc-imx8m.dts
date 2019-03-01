@@ -106,6 +106,14 @@
 		pinctrl-0 = <&pinctrl_wlan>;
 		reset-gpios = <&gpio2 19 GPIO_ACTIVE_LOW>;      /* WL_REG_ON */
 	};
+
+	bt_reset: bt_reset{
+		compatible = "gpio-reset";
+		reset-gpios = <&gpio5 11 GPIO_ACTIVE_LOW>;    /* BT_REG_ON */
+		reset-delay-us = <1000>;
+		reset-post-delay-ms = <40>;
+		#reset-cells = <0>;
+	};
 };
 
 &clk {
@@ -613,6 +621,7 @@
 	assigned-clocks = <&clk IMX8MQ_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_80M>;
 	fsl,uart-has-rtscts;
+	resets = <&bt_reset>;
 	status = "okay";
 };
 
