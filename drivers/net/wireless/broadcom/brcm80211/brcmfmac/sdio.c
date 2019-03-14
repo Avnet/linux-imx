@@ -2563,6 +2563,7 @@ brcmf_sdio_ulp_preinit(struct device *dev)
 	s32 err = 0;
 
 	brcmf_dbg(TRACE, "Enter\n");
+	return;
 
 	/* Query ulp_sdioctrl iovar to get the ULP related SHM offsets */
 	err = brcmf_fil_iovar_data_get(ifp, "ulp_sdioctrl", &sdiodev->shm_ulp,
