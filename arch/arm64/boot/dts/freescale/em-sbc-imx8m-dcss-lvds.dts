@@ -153,6 +153,29 @@
 				MX8MQ_IOMUXC_GPIO1_IO04_GPIO1_IO4   0x19 /* DSI_TS_RST */
 			>;
 		};
+
+		pinctrl_pwm1: pwm1_grp {
+			fsl,pins = <
+					MX8MQ_IOMUXC_GPIO1_IO01_PWM1_OUT  0x06
+			>;
+		};
 	};
 };
 
+
+/ {
+
+	lvds_backlight {
+			compatible = "pwm-backlight";
+			pwms = <&pwm1 0 10000 0>;
+			brightness-levels = <0 4 8 16 32 64 128 255>;
+			default-brightness-level = <6>;
+			status = "okay";
+	};
+};
+
+&pwm1 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pwm1>;
+        status = "okay";
+};
