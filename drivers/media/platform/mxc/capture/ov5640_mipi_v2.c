@@ -1182,7 +1182,7 @@ static int ov5640_init_mode(struct ov5640 *sensor,
 		/* dump the first eighteen frames: 1/30*18 */
 		msec_wait4stable = 600;
 	}
-	msleep(msec_wait4stable);
+	msleep(200);
 
 err:
 	return retval;
