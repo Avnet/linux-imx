@@ -63,6 +63,11 @@
 		regulator-enable-ramp-delay= <90>;
 };
 
+/* make usb0 as device mode to support ADB */
+&usb_dwc3_0 {
+	dr_mode = "peripheral";
+};
+
 /* Data for energy-aware-scheduling */
 /{
 	cpus {
