@@ -71,6 +71,14 @@ config DRM_NXP_SEIKO_43WVFIG
 	select DRM_KMS_HELPER
 	select DRM_PANEL
 
+config DRM_LONTIUM_LT2911
+	tristate "Lontium LT2911 dual-port MIPI/LVDS/TTL bridge"
+	depends on OF
+	select DRM_KMS_HELPER
+	select REGMAP_I2C
+	help
+	  Lontium Semiconductor LT2911 2-port MIPI-DSI/LVDS/TTL to 2-port MIPI-DSI/LVDS/TTL bridge chip driver.
+
 config DRM_NXP_PTN3460
 	tristate "NXP PTN3460 DP/LVDS bridge"
 	depends on OF
