@@ -13,6 +13,7 @@
  */
 
 #include "em-sbc-imx8m.dts"
+#include "em-sbc-imx8m-dcss-dsi.dtsi"
 
 /delete-node/ &bt_reset;
 
