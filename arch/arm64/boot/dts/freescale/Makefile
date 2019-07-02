@@ -98,8 +98,10 @@ dtb-$(CONFIG_ARCH_FSL_IMX8MQ) += fsl-imx8mq-ddr3l-arm2.dtb \
 				 fsl-imx8mq-ddr4-arm2.dtb \
 				 fsl-imx8mq-ddr4-arm2-gpmi-nand.dtb \
 				 fsl-imx8mq-evk.dtb \
-				 em-sbc-imx8m-android.dtb \
-				 em-sbc-imx8m-android-emmc.dtb \
+				 em-sbc-imx8m-android-mipi.dtb \
+				 em-sbc-imx8m-android-hdmi.dtb \
+				 em-sbc-imx8m-android-lvds.dtb \
+				 em-sbc-imx8m-android-emmc-hdmi.dtb \
 				 fsl-imx8mq-evk-b3.dtb \
 				 fsl-imx8mq-evk-m4.dtb \
 				 fsl-imx8mq-evk-pcie1-m2.dtb \
