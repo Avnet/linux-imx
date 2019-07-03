@@ -57,7 +57,7 @@
 
 };
 
-&uart3 { /* BT */
+&uart4 { /* BT */
 	/delete-property/ resets;
 };
 

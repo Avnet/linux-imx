@@ -53,14 +53,14 @@
 
 			home {
 					label = "home Button";
-					gpios = <&gpio5 10 GPIO_ACTIVE_LOW>;
+					gpios = <&gpio3 7 GPIO_ACTIVE_LOW>;
 					linux,code = <102>;
 					gpio-key,wakeup;
 			};
 
 			back {
 					label = "back Button";
-					gpios = <&gpio5 12 GPIO_ACTIVE_LOW>;
+					gpios = <&gpio3 6 GPIO_ACTIVE_LOW>;
 					linux,code = <412>;
 			};
 	};
@@ -145,6 +145,7 @@
 				MX8MQ_IOMUXC_GPIO1_IO13_GPIO1_IO13	0x19	/*pin33*/
 				MX8MQ_IOMUXC_GPIO1_IO03_GPIO1_IO3	0x19	/*pin36*/
 				MX8MQ_IOMUXC_NAND_DATA05_GPIO3_IO11	0x19	/*pin37*/
+				MX8MQ_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K  0x05
 			>;
 		};
 
@@ -157,8 +158,8 @@
 
 		pinctrl_gpio_keys: gpio_keysgrp {
 			fsl,pins = <
-				MX8MQ_IOMUXC_ECSPI2_SCLK_GPIO5_IO10          0x1856
-				MX8MQ_IOMUXC_ECSPI2_MISO_GPIO5_IO12          0x56
+				MX8MQ_IOMUXC_NAND_DATA01_GPIO3_IO7          0x56
+				MX8MQ_IOMUXC_NAND_DATA00_GPIO3_IO6          0x56
 			>;
 		};
 
@@ -264,7 +265,7 @@
 
 		pinctrl_pmic: pmicirq {
 			fsl,pins = <
-				MX8MQ_IOMUXC_GPIO1_IO07_GPIO1_IO7		0x41
+				MX8MQ_IOMUXC_GPIO1_IO07_GPIO1_IO7		0x19
 			>;
 		};
 
@@ -305,9 +306,6 @@
 			fsl,pins = <
 				MX8MQ_IOMUXC_UART3_TXD_UART3_DCE_TX		0x49
 				MX8MQ_IOMUXC_UART3_RXD_UART3_DCE_RX		0x49
-				MX8MQ_IOMUXC_ECSPI1_MISO_UART3_DCE_CTS_B	0x49
-				MX8MQ_IOMUXC_ECSPI1_SS0_UART3_DCE_RTS_B		0x49
-				MX8MQ_IOMUXC_ECSPI2_MOSI_GPIO5_IO11			0x19
 			>;
 		};
 
@@ -315,6 +313,10 @@
 			fsl,pins = <
 				MX8MQ_IOMUXC_UART4_RXD_UART4_DCE_RX		0x49
 				MX8MQ_IOMUXC_UART4_TXD_UART4_DCE_TX		0x49
+				MX8MQ_IOMUXC_ECSPI2_SS0_UART4_DCE_RTS_B		0x49
+				MX8MQ_IOMUXC_ECSPI2_MISO_UART4_DCE_CTS_B	0x49
+
+				MX8MQ_IOMUXC_ECSPI2_MOSI_GPIO5_IO11		0x19
 			>;
 		};
 
@@ -322,14 +324,14 @@
 };
 
 /* console */
-&uart1 { 
+&uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MQ_CLK_UART1>;
 	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
 	status = "okay";
 };
- 
+
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc1>;
@@ -406,15 +408,6 @@
 	status = "okay";
 };
 
-&dcss {
-	status = "okay";
-	disp-dev = "hdmi_disp";
-};
-
-&hdmi {
-	status = "okay";
-};
-
 &i2c1 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
@@ -427,7 +420,7 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_pmic>;
 			interrupt-parent = <&gpio1>;
-			interrupts = <7 GPIO_ACTIVE_LOW>;
+			interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
 			interrupt-names = "irq-pmic";
 			#clock-cells = <0>;
 			clocks = <&osc 0>;
@@ -605,22 +598,22 @@
 	status = "okay";
 };
 
-/* BT */
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
 	assigned-clocks = <&clk IMX8MQ_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_80M>;
-	fsl,uart-has-rtscts;
-	resets = <&bt_reset>;
-	status = "okay";
+	status = "disabled";
 };
 
+/* BT */
 &uart4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4>;
 	assigned-clocks = <&clk IMX8MQ_CLK_UART4>;
 	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	fsl,uart-has-rtscts;
+	resets = <&bt_reset>;
 	status = "okay";
 };
 
