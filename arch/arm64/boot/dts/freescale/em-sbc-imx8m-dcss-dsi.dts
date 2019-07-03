@@ -93,7 +93,7 @@
 		compatible = "ilitek,ili9881c";
 		reg = <0>;
 		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
-		enable-gpio = <&gpio5 6 GPIO_ACTIVE_HIGH>;
+		enable-gpio = <&gpio3 12 GPIO_ACTIVE_HIGH>;
 		dsi-lanes = <2>;
 
 		port {
@@ -114,7 +114,7 @@
 	imx8mq-evk {
 		pinctrl_mipi_dsi_en: mipi_dsi_en {
 			fsl,pins = <
-				MX8MQ_IOMUXC_ECSPI1_SCLK_GPIO5_IO6	0x16 /*DSI_EN*/
+				MX8MQ_IOMUXC_NAND_DATA06_GPIO3_IO12	0x16 /*DSI_EN*/
 			>;
 		};
 
@@ -126,7 +126,7 @@
 
 		pinctrl_ts_ft5426: ft5426_pinsgrp {
 			fsl,pins = <
-				MX8MQ_IOMUXC_ECSPI1_MOSI_GPIO5_IO7  0x19 /* DSI_TS_nINT */
+				MX8MQ_IOMUXC_NAND_DATA07_GPIO3_IO13  0x19 /* DSI_TS_nINT */
 				MX8MQ_IOMUXC_GPIO1_IO04_GPIO1_IO4   0x19 /* DSI_TS_RST */
 			>;
 		};
@@ -188,10 +188,10 @@
 			reg = <0x38>;
 			pinctrl-0 = <&pinctrl_ts_ft5426>;
 
-			interrupt-parent = <&gpio5>;
-			interrupts = <7 2>;
+			interrupt-parent = <&gpio3>;
+			interrupts = <13 2>;
 			focaltech,reset-gpio = <&gpio1 4 0x01>;
-			focaltech,irq-gpio = <&gpio5 7 0x02>;
+			focaltech,irq-gpio = <&gpio3 13 0x02>;
 			focaltech,max-touch-number = <10>;
 			focaltech,panel-type = <0x54260002>;/* _FT5426 */
 			focaltech,display-coords =  <0 0 720 1280>;
