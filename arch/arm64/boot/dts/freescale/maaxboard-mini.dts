@@ -50,6 +50,13 @@
 			>;
 		};
 
+		pinctrl_i2c4: i2c4grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_I2C4_SCL_I2C4_SCL			0x400001c3
+				MX8MM_IOMUXC_I2C4_SDA_I2C4_SDA			0x400001c3
+			>;
+		};
+
 		pinctrl_pmic: pmicirq {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3   0x41
@@ -106,6 +113,13 @@
 		pinctrl_pwm4: pwm4_grp {
 			fsl,pins = <
 					MX8MM_IOMUXC_SAI3_MCLK_PWM4_OUT  0x06
+			>;
+		};
+
+		pinctrl_ts_ft5426: ft5426_pinsgrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SAI5_RXFS_GPIO3_IO19  0x19 /* DSI_TS_nINT */
+				MX8MM_IOMUXC_SAI5_RXC_GPIO3_IO20   0x19 /* DSI_TS_RST */
 			>;
 		};
 	};
@@ -293,4 +307,30 @@
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_pwm4>;
         status = "okay";
+};
+
+&i2c4 {
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c4>;
+	status = "okay";
+
+	ft5426_ts@38 {
+			compatible = "focaltech,fts";
+			reg = <0x38>;
+			pinctrl-0 = <&pinctrl_ts_ft5426>;
+
+			interrupt-parent = <&gpio3>;
+			interrupts = <19 2>;
+			focaltech,reset-gpio = <&gpio3 20 0x01>;
+			focaltech,irq-gpio = <&gpio3 19 0x02>;
+			focaltech,max-touch-number = <10>;
+			focaltech,panel-type = <0x54260002>;/* _FT5426 */
+			focaltech,display-coords =  <0 0 720 1280>;
+			focaltech,have-key;
+			focaltech,key-number = <3>;
+			focaltech,keys = <139 102 158>;
+			focaltech,key-y-coord = <2000>;
+			focaltech,key-x-coords = <200 600 800>;
+	};
 };
