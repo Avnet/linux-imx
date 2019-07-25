@@ -24,6 +24,14 @@
 		bootargs = "console=ttymxc1,115200 earlycon=ec_imx6q,0x30890000,115200";
 		stdout-path = &uart2;
 	};
+
+	backlight {
+			compatible = "pwm-backlight";
+			pwms = <&pwm4 0 500000 0>;
+			brightness-levels = <0 1 8 32 64 96 128 160 192 224 255>;
+			default-brightness-level = <8>;
+			status = "okay";
+	};
 };
 
 &clk {
@@ -92,6 +100,12 @@
 		pinctrl_mipi_dsi_en: mipi_dsi_en {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO09_GPIO1_IO9	0x16 /*DSI_EN*/
+			>;
+		};
+
+		pinctrl_pwm4: pwm4_grp {
+			fsl,pins = <
+					MX8MM_IOMUXC_SAI3_MCLK_PWM4_OUT  0x06
 			>;
 		};
 	};
@@ -273,4 +287,10 @@
 		dsi-lanes = <2>;
 		status = "okay";
 	};
+};
+
+&pwm4 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pwm4>;
+        status = "okay";
 };
