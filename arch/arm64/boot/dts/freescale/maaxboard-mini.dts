@@ -25,6 +25,22 @@
 		stdout-path = &uart2;
 	};
 
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_usb1_power: regulator-usb-3v3 {
+			compatible = "regulator-fixed";
+			regulator-name = "usb1-power-en";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+			off-on-delay = <1000>;
+			startup-delay-us = <300>;
+		};
+	};
+
 	backlight {
 			compatible = "pwm-backlight";
 			pwms = <&pwm4 0 500000 0>;
@@ -43,6 +59,12 @@
 	pinctrl-names = "default";
 
 	imx8mm-evk {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12      0x02
+			>;
+		};
+
 		pinctrl_i2c1: i2c1grp {
 			fsl,pins = <
 				MX8MM_IOMUXC_I2C1_SCL_I2C1_SCL      0x400001c3
@@ -333,4 +355,20 @@
 			focaltech,key-y-coord = <2000>;
 			focaltech,key-x-coords = <200 600 800>;
 	};
+};
+
+&usbotg1 {
+	dr_mode = "otg";
+	extcon = <0>;
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
+	status = "okay";
+};
+
+&usbotg2 {
+	dr_mode = "otg";
+	extcon = <0>;
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
+	status = "okay";
 };
