@@ -48,6 +48,11 @@
 			default-brightness-level = <8>;
 			status = "okay";
 	};
+
+    wlan_pwrseq: sdio-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&gpio2 19 GPIO_ACTIVE_LOW>;      /* WL_REG_ON */
+	};
 };
 
 &clk {
@@ -123,6 +128,37 @@
 				MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7     0x1d4
 				MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B 0x1d4
 				MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE   0x194
+			>;
+		};
+
+        pinctrl_usdhc2: usdhc2grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK         0x190
+				MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD         0x1d0
+				MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0     0x1d0
+				MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1     0x1d0
+				MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2     0x1d0
+				MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3     0x1d0
+			>;
+		};
+
+		pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK         0x194
+				MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD         0x1d4
+				MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0     0x1d4
+				MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1     0x1d4
+				MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2     0x1d4
+				MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3     0x1d4
+			>;
+		};
+
+        pinctrl_wlan_gpio: usdhc2grpwlan {
+			fsl,pins = <
+                MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19     0x41 /* WL_REG_ON */
+				MX8MM_IOMUXC_SD2_WP_GPIO2_IO20          0x41 /* WL_HOST_WAKE irq */
+                MX8MM_IOMUXC_UART4_TXD_GPIO5_IO29       0x41 /* BT_REG_ON */
+                MX8MM_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K  0x141 /* SUSCLK_IN 32k */
 			>;
 		};
 
@@ -322,6 +358,29 @@
 	bus-width = <8>;
 	non-removable;
 	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_wlan_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_wlan_gpio>;
+	bus-width = <4>;
+	mmc-pwrseq = <&wlan_pwrseq>;
+	no-1-8-v;
+	non-removable;
+	pm-ignore-notify;
+	cap-power-off-card;
+	status = "okay";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	brcmf: bcrmf@1 {
+			reg = <1>;
+			compatible = "brcm,bcm4329-fmac";
+			interrupt-parent = <&gpio2>;
+			interrupts = <20 IRQ_TYPE_LEVEL_LOW>;
+			interrupt-names = "host-wake";
+        };
 };
 
 &A53_0 {
