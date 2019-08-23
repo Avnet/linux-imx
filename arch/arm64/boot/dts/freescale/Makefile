@@ -118,6 +118,7 @@ dtb-$(CONFIG_ARCH_FSL_IMX8MQ) += fsl-imx8mq-ddr3l-arm2.dtb \
 				 fsl-imx8mq-evk-edp.dtb
 dtb-$(CONFIG_ARCH_FSL_IMX8MM) += fsl-imx8mm-evk.dtb \
 				 maaxboard-mini.dtb \
+				 maaxboard-mini-lvds.dtb \
 				 fsl-imx8mm-evk-ak4497.dtb \
 				 fsl-imx8mm-evk-m4.dtb \
 				 fsl-imx8mm-evk-ak5558.dtb \
