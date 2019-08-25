@@ -54,6 +54,27 @@
 		reset-gpios = <&gpio2 19 GPIO_ACTIVE_LOW>;      /* WL_REG_ON */
 	};
 
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		status = "okay";
+
+		sys_led {
+				label = "sys_led";
+				gpios = <&gpio3 2 0>;
+				default-state = "on";
+				linux,default-trigger = "heartbeat";
+		};
+
+		usr_led {
+				label = "usr_led";
+				gpios = <&gpio3 3 0>;
+				default-state = "on";
+		};
+
+	};
+
     gpio_keys {
         compatible = "gpio-keys";
         pinctrl-names = "default";
@@ -86,6 +107,13 @@
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12      0x02
+			>;
+		};
+
+		pinctrl_gpio_leds: gpio_ledsgrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_NAND_CE1_B_GPIO3_IO2                0x19
+				MX8MM_IOMUXC_NAND_CE2_B_GPIO3_IO3                0x19
 			>;
 		};
 
