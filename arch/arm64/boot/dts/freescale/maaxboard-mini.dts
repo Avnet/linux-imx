@@ -21,8 +21,8 @@
 	compatible = "fsl,imx8mm-evk", "fsl,imx8mm";
 
 	chosen {
-		bootargs = "console=ttymxc1,115200 earlycon=ec_imx6q,0x30890000,115200";
-		stdout-path = &uart2;
+		bootargs = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200";
+		stdout-path = &uart1;
 	};
 
 	regulators {
@@ -53,6 +53,46 @@
 		compatible = "mmc-pwrseq-simple";
 		reset-gpios = <&gpio2 19 GPIO_ACTIVE_LOW>;      /* WL_REG_ON */
 	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		status = "okay";
+
+		sys_led {
+				label = "sys_led";
+				gpios = <&gpio3 2 0>;
+				default-state = "on";
+				linux,default-trigger = "heartbeat";
+		};
+
+		usr_led {
+				label = "usr_led";
+				gpios = <&gpio3 3 0>;
+				default-state = "on";
+		};
+
+	};
+
+    gpio_keys {
+        compatible = "gpio-keys";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_gpio_keys>;
+
+        home {
+            label = "home Button";
+            gpios = <&gpio3 15 GPIO_ACTIVE_LOW>;
+            linux,code = <KEY_HOMEPAGE>;
+            wakeup-source;
+        };
+
+        back {
+            label = "back Button";
+            gpios = <&gpio3 1 GPIO_ACTIVE_LOW>;
+            linux,code = <KEY_BACK>;
+        };
+	};
 };
 
 &clk {
@@ -67,6 +107,20 @@
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12      0x02
+			>;
+		};
+
+		pinctrl_gpio_leds: gpio_ledsgrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_NAND_CE1_B_GPIO3_IO2                0x19
+				MX8MM_IOMUXC_NAND_CE2_B_GPIO3_IO3                0x19
+			>;
+		};
+
+		pinctrl_gpio_keys: gpio_keysgrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_NAND_RE_B_GPIO3_IO15   0x144
+				MX8MM_IOMUXC_NAND_CE0_B_GPIO3_IO1   0x144
 			>;
 		};
 
@@ -87,6 +141,13 @@
 		pinctrl_pmic: pmicirq {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3   0x41
+			>;
+		};
+
+		pinctrl_uart1: uart1grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_UART1_RXD_UART1_DCE_RX	0x140
+				MX8MM_IOMUXC_UART1_TXD_UART1_DCE_TX	0x140
 			>;
 		};
 
@@ -156,7 +217,7 @@
         pinctrl_wlan_gpio: usdhc2grpwlan {
 			fsl,pins = <
                 MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19     0x41 /* WL_REG_ON */
-				MX8MM_IOMUXC_SD2_WP_GPIO2_IO20          0x41 /* WL_HOST_WAKE irq */
+                MX8MM_IOMUXC_SD2_WP_GPIO2_IO20          0x41 /* WL_HOST_WAKE irq */
                 MX8MM_IOMUXC_UART4_TXD_GPIO5_IO29       0x41 /* BT_REG_ON */
                 MX8MM_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K  0x141 /* SUSCLK_IN 32k */
 			>;
@@ -198,6 +259,19 @@
 				MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91
 				MX8MM_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x1f
 				MX8MM_IOMUXC_GPIO1_IO07_GPIO1_IO7	0x19
+			>;
+		};
+
+		pinctrl_csi_pwn: csi_pwn_grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SAI5_RXD1_GPIO3_IO22		0x19
+			>;
+		};
+
+		pinctrl_csi_rst: csi_rst_grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SAI5_RXD0_GPIO3_IO21		0x19
+				MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59
 			>;
 		};
 	};
@@ -343,9 +417,39 @@
 			};
 		};
 	};
+
+	ov5640_mipi: ov5640_mipi@3c {
+		compatible = "ovti,ov5640_mipi";
+		reg = <0x3c>;
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi_pwn>, <&pinctrl_csi_rst>;
+		clocks = <&clk IMX8MM_CLK_CLKO1_DIV>;
+		clock-names = "csi_mclk";
+		assigned-clocks = <&clk IMX8MM_CLK_CLKO1_SRC>,
+				  <&clk IMX8MM_CLK_CLKO1_DIV>;
+		assigned-clock-parents = <&clk IMX8MM_CLK_24M>;
+		assigned-clock-rates = <0>, <24000000>;
+		csi_id = <0>;
+		pwn-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		port {
+			ov5640_mipi1_ep: endpoint {
+				remote-endpoint = <&mipi1_sensor_ep>;
+			};
+		};
+	};
 };
 
-&uart2 { /* console */
+&uart1 { /* console */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	status = "okay";
+};
+
+&uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
 	status = "okay";
@@ -385,6 +489,22 @@
 
 &A53_0 {
 	arm-supply = <&buck2_reg>;
+};
+
+&gpu {
+	status = "okay";
+};
+
+&vpu_g1 {
+	status = "okay";
+};
+
+&vpu_g2 {
+	status = "okay";
+};
+
+&vpu_h1 {
+	status = "okay";
 };
 
 &lcdif {
@@ -437,16 +557,14 @@
 };
 
 &usbotg1 {
-	dr_mode = "otg";
-	extcon = <0>;
+	dr_mode = "host";
 	picophy,pre-emp-curr-control = <3>;
 	picophy,dc-vol-level-adjust = <7>;
 	status = "okay";
 };
 
 &usbotg2 {
-	dr_mode = "otg";
-	extcon = <0>;
+	dr_mode = "host";
 	picophy,pre-emp-curr-control = <3>;
 	picophy,dc-vol-level-adjust = <7>;
 	status = "okay";
@@ -470,6 +588,36 @@
 			at803x,led-act-blind-workaround;
 			at803x,eee-okay;
 			at803x,vddio-1p8v;
+		};
+	};
+};
+
+&csi1_bridge {
+	fsl,mipi-mode;
+    /*fsl,two-8bit-sensor-mode;*/
+	status = "okay";
+	port {
+		csi1_ep: endpoint {
+			remote-endpoint = <&csi1_mipi_ep>;
+		};
+	};
+};
+
+&mipi_csi_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	port {
+		mipi1_sensor_ep: endpoint1 {
+			remote-endpoint = <&ov5640_mipi1_ep>;
+			data-lanes = <2>;
+			csis-hs-settle = <13>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+		};
+
+		csi1_mipi_ep: endpoint2 {
+			remote-endpoint = <&csi1_ep>;
 		};
 	};
 };

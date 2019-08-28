@@ -37,8 +37,19 @@
 			};
 		};
 	};
+
+};
+
+&crypto {
+       status = "disabled";
 };
 
 &wdog1 {
+	status = "okay";
+};
+
+/* make usb0 as device mode to support ADB */
+&usbotg1 {
+	dr_mode = "peripheral";
 	status = "okay";
 };
