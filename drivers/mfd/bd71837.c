@@ -24,9 +24,12 @@
 #include <linux/of_gpio.h>
 #include <linux/mfd/core.h>
 #include <linux/mfd/bd71837.h>
+#include <linux/reboot.h>
 
 /* Default enable debug message All Level */
 unsigned int bd71837_debug_mask = BD71837_DBG0;
+static struct bd71837 *bd71837_pm;
+
 
 /** @brief bd71837 irq resource */
 static struct resource pmic_resources[] = {
@@ -123,6 +126,19 @@ static bool is_volatile_reg(struct device *dev, unsigned int reg)
 	 */
 	return true;
 }
+
+static int bd71837_reset_handle(struct notifier_block *this,
+			    unsigned long mode, void *cmd)
+{
+	bd71837_reg_write(bd71837_pm, BD71837_REG_SWRESET, 0x07);
+
+	return NOTIFY_DONE;
+}
+
+static struct notifier_block bd71837_restart_handler = {
+        .notifier_call = bd71837_reset_handle,
+        .priority = 192,
+};
 
 /** @brief regmap configures */
 static const struct regmap_config bd71837_regmap_config = {
@@ -251,6 +267,15 @@ static int bd71837_i2c_probe(struct i2c_client *i2c,
 	if (ret < 0)
 		goto err;
 
+
+	bd71837_pm = bd71837;
+
+	ret = register_restart_handler(&bd71837_restart_handler);
+	if (ret) {
+		dev_err(&i2c->dev, "cannot register restart handler, %d\n", ret);
+		return ret;
+	}
+
 	return ret;
 
 err:
@@ -270,6 +295,9 @@ static int bd71837_i2c_remove(struct i2c_client *i2c)
 	bd71837_irq_exit(bd71837);
 	mfd_remove_devices(bd71837->dev);
 	kfree(bd71837);
+
+	bd71837_pm = NULL;
+	unregister_restart_handler(&bd71837_restart_handler);
 
 	return 0;
 }
