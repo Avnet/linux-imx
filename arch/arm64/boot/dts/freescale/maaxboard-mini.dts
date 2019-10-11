@@ -158,6 +158,15 @@
 			>;
 		};
 
+		pinctrl_uart4: uart4grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_ECSPI2_SCLK_UART4_DCE_RX  0x140
+				MX8MM_IOMUXC_ECSPI2_MOSI_UART4_DCE_TX  0x140
+				MX8MM_IOMUXC_ECSPI2_MISO_UART4_DCE_CTS_B  0x140
+				MX8MM_IOMUXC_ECSPI2_SS0_UART4_DCE_RTS_B  0x140
+			>;
+		};
+
 		pinctrl_usdhc1: usdhc1grp {
 			fsl,pins = <
 				MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK         0x190
@@ -271,7 +280,7 @@
 		pinctrl_csi_rst: csi_rst_grp {
 			fsl,pins = <
 				MX8MM_IOMUXC_SAI5_RXD0_GPIO3_IO21		0x19
-				MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59
+				/* MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59 */
 			>;
 		};
 	};
@@ -426,10 +435,12 @@
 		pinctrl-0 = <&pinctrl_csi_pwn>, <&pinctrl_csi_rst>;
 		clocks = <&clk IMX8MM_CLK_CLKO1_DIV>;
 		clock-names = "csi_mclk";
+#if 0
 		assigned-clocks = <&clk IMX8MM_CLK_CLKO1_SRC>,
 				  <&clk IMX8MM_CLK_CLKO1_DIV>;
 		assigned-clock-parents = <&clk IMX8MM_CLK_24M>;
 		assigned-clock-rates = <0>, <24000000>;
+#endif
 		csi_id = <0>;
 		pwn-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>;
 		rst-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
@@ -455,6 +466,15 @@
 	status = "okay";
 };
 
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4>;
+	assigned-clocks = <&clk IMX8MM_CLK_UART4_SRC>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz";
 	pinctrl-0 = <&pinctrl_usdhc1>;
@@ -473,7 +493,7 @@
 	no-1-8-v;
 	non-removable;
 	pm-ignore-notify;
-	cap-power-off-card;
+	keep-power-in-suspend;
 	status = "okay";
 
 	#address-cells = <1>;

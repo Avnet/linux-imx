@@ -38,6 +38,12 @@
 		};
 	};
 
+    bt_rfkill {
+		compatible = "fsl,mxc_bt_rfkill";
+		bt-power-gpios = <&gpio5 29 GPIO_ACTIVE_HIGH>; /* BT_REG_ON */
+		status ="okay";
+	};
+
 };
 
 &crypto {
