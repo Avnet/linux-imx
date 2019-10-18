@@ -349,7 +349,7 @@
 	no-1-8-v;
 	non-removable;
 	pm-ignore-notify;
-	cap-power-off-card;
+	keep-power-in-suspend;
 	status = "okay";
 
 	#address-cells = <1>;
