@@ -259,7 +259,6 @@
 			fsl,pins = <
 				MX8MQ_IOMUXC_NAND_WP_B_GPIO3_IO18		0x19
 				MX8MQ_IOMUXC_NAND_DQS_GPIO3_IO14		0x19
-				MX8MQ_IOMUXC_GPIO1_IO15_CCMSRCGPCMIX_CLKO2	0x59
 			>;
 		};
 
@@ -529,14 +528,11 @@
 		pinctrl-0 = <&pinctrl_csi1>;
 		clocks = <&clk IMX8MQ_CLK_CLKO2>;
 		clock-names = "csi_mclk";
-		assigned-clocks = <&clk IMX8MQ_CLK_CLKO2>;
-		assigned-clock-parents = <&clk IMX8MQ_SYS2_PLL_200M>;
-		assigned-clock-rates = <20000000>;
 		csi_id = <0>;
 		pwn-gpios = <&gpio3 14 GPIO_ACTIVE_HIGH>;
 		rst-gpios = <&gpio3 18 GPIO_ACTIVE_HIGH>;
 
-		mclk = <20000000>;
+		mclk = <24000000>;
 		mclk_source = <0>;
 		port {
 			ov5640_mipi1_ep: endpoint {
