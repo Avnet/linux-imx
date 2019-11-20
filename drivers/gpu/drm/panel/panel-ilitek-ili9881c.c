@@ -3,32 +3,23 @@
  * Copyright (C) 2017-2018, Bootlin
  */
 
-#include <linux/backlight.h>
-#include <linux/delay.h>
-#include <linux/device.h>
-#include <linux/err.h>
-#include <linux/errno.h>
-#include <linux/fb.h>
-#include <linux/kernel.h>
 #include <linux/module.h>
-
 #include <linux/gpio/consumer.h>
 #include <linux/regulator/consumer.h>
-
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
-
+#include <drm/drmP.h>
+#include <drm/drm_crtc.h>
 #include <video/mipi_display.h>
 #include <video/videomode.h>
 
-#define USE_DISPLAY_TIMINGS
+/*#define USE_DISPLAY_TIMINGS*/
 
 struct ili9881c_panel {
 	struct drm_panel	panel;
 	struct mipi_dsi_device	*dsi;
 
-	struct backlight_device *backlight;
 	struct gpio_desc	*enable_gpio;
 	struct gpio_desc	*reset_gpio;
 };
@@ -317,6 +308,7 @@ static void ili9881c_getID(struct ili9881c_panel *tftcp)
 {
 	u8 id[3];
 
+    tftcp->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 	ili9881c_switch_page(tftcp, 1);
 	id[0] = ili9881c_read_cmd_data(tftcp, 0x00);
 	id[1] = ili9881c_read_cmd_data(tftcp, 0x01);
@@ -344,8 +336,6 @@ static int ili9881c_prepare(struct drm_panel *panel)
 	dev_dbg(&tftcp->dsi->dev,"%s\n",__func__);
 
     ili9881c_reset(tftcp);
-	tftcp->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
-	ili9881c_getID(tftcp);
 
 	return 0;
 }
@@ -380,7 +370,6 @@ static int ili9881c_enable(struct drm_panel *panel)
 		dev_err(&tftcp->dsi->dev, "Failed to set tear ON (%d)\n", ret);
 		return ret;
 	}
-	usleep_range(100000, 110000);
 
 	/* Exit sleep mode */
 	ret = mipi_dsi_dcs_exit_sleep_mode(tftcp->dsi);
@@ -397,7 +386,6 @@ static int ili9881c_enable(struct drm_panel *panel)
 		return ret;
 	}
 
-	backlight_enable(tftcp->backlight);
 	dev_dbg(&tftcp->dsi->dev,"%s\n",__func__);
 
 	return 0;
@@ -406,11 +394,25 @@ static int ili9881c_enable(struct drm_panel *panel)
 static int ili9881c_disable(struct drm_panel *panel)
 {
 	struct ili9881c_panel *tftcp = panel_to_ili9881c(panel);
+	int ret;
 
 	tftcp->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
-	backlight_disable(tftcp->backlight);
-	return mipi_dsi_dcs_set_display_off(tftcp->dsi);
+	ret = mipi_dsi_dcs_set_display_off(tftcp->dsi);
+	if (ret < 0) {
+		dev_err(&tftcp->dsi->dev, "Failed to set display OFF (%d)\n", ret);
+		return ret;
+	}
+
+	usleep_range(100000, 110000);
+
+	ret = mipi_dsi_dcs_enter_sleep_mode(tftcp->dsi);
+	if (ret < 0) {
+		dev_err(&tftcp->dsi->dev, "Failed to enter sleep mode (%d)\n", ret);
+		return ret;
+	}
+
+	return 0;
 }
 
 static int ili9881c_unprepare(struct drm_panel *panel)
@@ -418,7 +420,6 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 	struct ili9881c_panel *tftcp = panel_to_ili9881c(panel);
 
 	dev_dbg(&tftcp->dsi->dev,"%s\n",__func__);
-	mipi_dsi_dcs_enter_sleep_mode(tftcp->dsi);
 
 	if (tftcp->enable_gpio != NULL)
 		gpiod_set_value(tftcp->enable_gpio, 0);
@@ -430,7 +431,7 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 
 #ifndef USE_DISPLAY_TIMINGS
 static const struct drm_display_mode default_mode = {
-	.clock		= 67000,
+	.clock		= 60000,
 	.vrefresh	= 60,
 
 	.hdisplay	= 720,
@@ -449,7 +450,7 @@ static const struct drm_display_mode default_mode = {
 frame rate = 52.5Hz [2 data lanes: 50~60Hz]
 pclk=800M * 2lane / 24bpp =66.67M */
 static const struct display_timing ph720128t003_timing = {
-    .pixelclock = { 64000000, 67000000, 7100000 },
+    .pixelclock = { 64000000, 62000000, 7100000 },
 	.hactive = { 720, 720, 720 },
 	.hfront_porch = { 80, 120, 120 },
 	.hback_porch = { 10, 20, 60 },
@@ -465,6 +466,12 @@ static const struct display_timing ph720128t003_timing = {
 };
 #endif
 
+static const u32 bus_formats[] = {
+	MEDIA_BUS_FMT_RGB888_1X24,
+	MEDIA_BUS_FMT_RGB666_1X18,
+	MEDIA_BUS_FMT_RGB565_1X16,
+};
+
 static int ili9881c_get_modes(struct drm_panel *panel)
 {
 	struct drm_connector *connector = panel->connector;
@@ -472,6 +479,7 @@ static int ili9881c_get_modes(struct drm_panel *panel)
 	struct drm_display_mode *mode;
 #ifdef USE_DISPLAY_TIMINGS
 	struct videomode vm;
+	u32 *bus_flags = &connector->display_info.bus_flags;
 #endif
 
 #ifndef USE_DISPLAY_TIMINGS
@@ -497,70 +505,30 @@ static int ili9881c_get_modes(struct drm_panel *panel)
 	}
 
 	drm_display_mode_from_videomode(&vm, mode);
+
+	if (vm.flags & DISPLAY_FLAGS_DE_HIGH)
+		*bus_flags |= DRM_BUS_FLAG_DE_HIGH;
+	if (vm.flags & DISPLAY_FLAGS_DE_LOW)
+		*bus_flags |= DRM_BUS_FLAG_DE_LOW;
+	if (vm.flags & DISPLAY_FLAGS_PIXDATA_NEGEDGE)
+		*bus_flags |= DRM_BUS_FLAG_PIXDATA_NEGEDGE;
+	if (vm.flags & DISPLAY_FLAGS_PIXDATA_POSEDGE)
+		*bus_flags |= DRM_BUS_FLAG_PIXDATA_POSEDGE;
 #endif
 
+	mode->width_mm = 153;
+	mode->height_mm = 90;
+	connector->display_info.width_mm = mode->width_mm;
+	connector->display_info.height_mm = mode->height_mm;
+
 	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+
+	drm_display_info_set_bus_formats(&connector->display_info,
+			bus_formats, ARRAY_SIZE(bus_formats));
+
 	drm_mode_probed_add(connector, mode);
 
-	panel->connector->display_info.width_mm = 153;
-	panel->connector->display_info.height_mm = 90;
-
 	return 1;
-}
-
-
-static int dsi_dcs_bl_get_brightness(struct backlight_device *bl)
-{
-	struct mipi_dsi_device *dsi = bl_get_data(bl);
-	int ret;
-	u16 brightness = bl->props.brightness;
-
-	dsi->mode_flags &= ~MIPI_DSI_MODE_LPM;
-
-	ret = mipi_dsi_dcs_get_display_brightness(dsi, &brightness);
-	if (ret < 0)
-		return ret;
-
-	bl->props.brightness = brightness;
-	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
-
-	return brightness & 0xff;
-}
-
-static int dsi_dcs_bl_update_status(struct backlight_device *bl)
-{
-	struct mipi_dsi_device *dsi = bl_get_data(bl);
-	int ret;
-
-	dsi->mode_flags &= ~MIPI_DSI_MODE_LPM;
-
-	ret = mipi_dsi_dcs_set_display_brightness(dsi, bl->props.brightness);
-	if (ret < 0)
-		return ret;
-
-	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
-
-	return 0;
-}
-
-static const struct backlight_ops dsi_bl_ops = {
-	.update_status = dsi_dcs_bl_update_status,
-	.get_brightness = dsi_dcs_bl_get_brightness,
-};
-
-static struct backlight_device *
-drm_panel_create_dsi_backlight(struct mipi_dsi_device *dsi)
-{
-	struct device *dev = &dsi->dev;
-	struct backlight_properties props;
-
-	memset(&props, 0, sizeof(props));
-	props.type = BACKLIGHT_RAW;
-	props.brightness = 255;
-	props.max_brightness = 255;
-
-	return devm_backlight_device_register(dev, dev_name(dev), dev, dsi,
-					      &dsi_bl_ops, &props);
 }
 
 static const struct drm_panel_funcs ili9881c_funcs = {
@@ -579,8 +547,14 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 	tftcp = devm_kzalloc(&dsi->dev, sizeof(*tftcp), GFP_KERNEL);
 	if (!tftcp)
 		return -ENOMEM;
+
 	mipi_dsi_set_drvdata(dsi, tftcp);
 	tftcp->dsi = dsi;
+
+	dsi->mode_flags =  MIPI_DSI_MODE_VIDEO_HSE | MIPI_DSI_MODE_VIDEO | MIPI_DSI_CLOCK_NON_CONTINUOUS;
+	/* non-burst mode with sync pulse */
+	dsi->mode_flags |= MIPI_DSI_MODE_VIDEO_SYNC_PULSE;
+	dsi->format = MIPI_DSI_FMT_RGB888;
 
 	tftcp->enable_gpio = devm_gpiod_get(&dsi->dev, "enable", GPIOD_OUT_HIGH);
 	if (IS_ERR(tftcp->enable_gpio)) {
@@ -601,13 +575,6 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 		dsi->lanes = 4;
 	}
 
-	tftcp->backlight = drm_panel_create_dsi_backlight(tftcp->dsi);
-	if (IS_ERR(tftcp->backlight)) {
-		ret = PTR_ERR(tftcp->backlight);
-		dev_err(&dsi->dev, "failed to register backlight %d\n", ret);
-		return ret;
-	}
-
 	drm_panel_init(&tftcp->panel);
 	tftcp->panel.dev = &dsi->dev;
 	tftcp->panel.funcs = &ili9881c_funcs;
@@ -616,22 +583,33 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 	if (ret < 0)
 		return ret;
 
-	dsi->mode_flags =  MIPI_DSI_MODE_VIDEO_HSE | MIPI_DSI_MODE_VIDEO | MIPI_DSI_CLOCK_NON_CONTINUOUS;
-	/* non-burst mode with sync pulse */
-	dsi->mode_flags |= MIPI_DSI_MODE_VIDEO_SYNC_PULSE;
-	dsi->format = MIPI_DSI_FMT_RGB888;
+	ret = mipi_dsi_attach(dsi);
+	if (ret < 0)
+		drm_panel_remove(&tftcp->panel);
 
-	return mipi_dsi_attach(dsi);
+	return ret;
 }
 
 static int ili9881c_dsi_remove(struct mipi_dsi_device *dsi)
 {
 	struct ili9881c_panel *tftcp = mipi_dsi_get_drvdata(dsi);
 
+	ili9881c_disable(&tftcp->panel);
 	mipi_dsi_detach(dsi);
-	drm_panel_remove(&tftcp->panel);
+	drm_panel_detach(&tftcp->panel);
+
+	if (tftcp->panel.dev)
+		drm_panel_remove(&tftcp->panel);
 
 	return 0;
+}
+
+static void ili9881c_dsi_shutdown(struct mipi_dsi_device *dsi)
+{
+	struct ili9881c_panel *tftcp = mipi_dsi_get_drvdata(dsi);
+
+	ili9881c_disable(&tftcp->panel);
+	ili9881c_unprepare(&tftcp->panel);
 }
 
 static const struct of_device_id ili9881c_of_match[] = {
@@ -643,6 +621,7 @@ MODULE_DEVICE_TABLE(of, ili9881c_of_match);
 static struct mipi_dsi_driver ili9881c_dsi_driver = {
 	.probe		= ili9881c_dsi_probe,
 	.remove		= ili9881c_dsi_remove,
+	.shutdown	= ili9881c_dsi_shutdown,
 	.driver = {
 		.name		= "panel-ili9881c-dsi",
 		.of_match_table	= ili9881c_of_match,
