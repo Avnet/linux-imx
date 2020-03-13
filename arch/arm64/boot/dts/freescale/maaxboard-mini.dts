@@ -316,7 +316,6 @@
 		pinctrl_csi_rst: csi_rst_grp {
 			fsl,pins = <
 				MX8MM_IOMUXC_SAI5_RXD0_GPIO3_IO21		0x19
-				//MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59
 			>;
 		};
 	};
@@ -471,10 +470,6 @@
 		pinctrl-0 = <&pinctrl_csi_pwn>, <&pinctrl_csi_rst>;
 		clocks = <&clk IMX8MM_CLK_CLKO1_DIV>;
 		clock-names = "csi_mclk";
-		assigned-clocks = <&clk IMX8MM_CLK_CLKO1_SRC>,
-				  <&clk IMX8MM_CLK_CLKO1_DIV>;
-		assigned-clock-parents = <&clk IMX8MM_CLK_24M>;
-		assigned-clock-rates = <0>, <24000000>;
 		csi_id = <0>;
 		pwn-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>;
 		rst-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
