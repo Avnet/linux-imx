@@ -12,10 +12,22 @@
  * GNU General Public License for more details.
  */
 
-#include "em-sbc-imx8m.dts"
+#include "maaxboard.dtsi"
+#include "maaxboard-extended-gpio.dtsi"
 
-&usb_dwc3_0 {
+&dcss {
 	status = "okay";
-	dr_mode = "peripheral";
+	disp-dev = "hdmi_disp";
 };
 
+&hdmi {
+	status = "okay";
+};
+
+&hdmi_audio {
+	status = "okay";
+};
+
+&sai4 {
+	status = "okay";
+};

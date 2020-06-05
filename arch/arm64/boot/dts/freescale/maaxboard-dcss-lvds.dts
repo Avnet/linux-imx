@@ -1,0 +1,76 @@
+/*
+ * Copyright 2019 EMBEST
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "maaxboard.dtsi"
+#include "maaxboard-extended-gpio.dtsi"
+#include "maaxboard-dcss-common.dtsi"
+
+&mipi_dsi_bridge {
+	status = "okay";
+
+    port@1 {
+		mipi_dsi_bridge_lvds: endpoint {
+			remote-endpoint = <&lt2911_in>;
+		};
+	};
+};
+
+&i2c4 {
+    lt2911@29 {
+		compatible = "lontium,lt2911";
+		reg = <0x29>;
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		enable-gpio = <&gpio3 12 GPIO_ACTIVE_HIGH>;
+
+		port {
+			lt2911_in: endpoint {
+				remote-endpoint = <&mipi_dsi_bridge_lvds>;
+			};
+		};
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: timing1 {
+				clock-frequency = <34000000>;
+				hactive = <1024>;
+				vactive = <600>;
+				hfront-porch = <60>;
+				hsync-len = <60>;
+				hback-porch = <100>;
+				vfront-porch = <2>;
+				vsync-len = <5>;
+				vback-porch = <10>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <0>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
+&pwm1 {
+        status = "okay";
+};
+
+&backlight {
+	status = "okay";
+};
+
+&ft5426 {
+	status = "okay";
+
+	focaltech,max-touch-number = <5>;
+	focaltech,display-coords =  <0 0 1024 600>;
+};

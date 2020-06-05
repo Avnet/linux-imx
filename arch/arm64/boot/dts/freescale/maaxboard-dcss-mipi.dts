@@ -1,0 +1,53 @@
+/*
+ * Copyright 2019 EMBEST
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "maaxboard.dtsi"
+#include "maaxboard-extended-gpio.dtsi"
+#include "maaxboard-dcss-common.dtsi"
+
+&mipi_dsi_bridge {
+	status = "okay";
+
+	panel@0 {
+		compatible = "ilitek,ili9881c";
+		reg = <0>;
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		enable-gpio = <&gpio3 12 GPIO_ACTIVE_HIGH>;
+		dsi-lanes = <2>;
+
+		port {
+			panel1_in: endpoint {
+				remote-endpoint = <&mipi_dsi_bridge_out>;
+			};
+		};
+	};
+
+	port@2 {
+		mipi_dsi_bridge_out: endpoint {
+			remote-endpoint = <&panel1_in>;
+		};
+	};
+};
+
+&pwm1 {
+        status = "okay";
+};
+
+&backlight {
+	status = "okay";
+};
+
+&ft5426 {
+	status = "okay";
+};

@@ -94,10 +94,10 @@ dtb-$(CONFIG_ARCH_FSL_IMX8MQ) += fsl-imx8mq-ddr3l-arm2.dtb \
 				 fsl-imx8mq-ddr4-arm2.dtb \
 				 fsl-imx8mq-ddr4-arm2-gpmi-nand.dtb \
 				 fsl-imx8mq-evk.dtb \
-				 em-sbc-imx8m.dtb \
-				 em-sbc-imx8m-dcss-dsi.dtb \
-				 em-sbc-imx8m-dcss-lvds.dtb \
-				 em-sbc-imx8m-usb0-device.dtb \
+				 maaxboard-dcss-hdmi.dtb \
+				 maaxboard-dcss-mipi.dtb \
+				 maaxboard-dcss-lvds.dtb \
+				 maaxboard-usb0-device.dtb \
 				 fsl-imx8mq-evk-b3.dtb \
 				 fsl-imx8mq-evk-m4.dtb \
 				 fsl-imx8mq-evk-pcie1-m2.dtb \

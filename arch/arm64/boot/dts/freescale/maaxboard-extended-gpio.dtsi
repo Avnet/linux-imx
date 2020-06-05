@@ -1,0 +1,132 @@
+/*
+ * Copyright 2019 EMBEST
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/* 40-pin extended GPIO, expanded into SPI, I2C, PWM and other interfaces */
+
+&iomuxc {
+	imx8mq-evk {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				/*Default GPIOs*/
+				MX8MQ_IOMUXC_NAND_READY_B_GPIO3_IO16	0x19	/* PIN 7,  GPIO 4  */
+				MX8MQ_IOMUXC_NAND_WE_B_GPIO3_IO17		0x19	/* PIN 11, GPIO 17 */
+				MX8MQ_IOMUXC_NAND_DATA02_GPIO3_IO8		0x19	/* PIN 13, GPIO 27 */
+				MX8MQ_IOMUXC_NAND_DATA03_GPIO3_IO9		0x19	/* PIN 15, GPIO 22 */
+				MX8MQ_IOMUXC_NAND_RE_B_GPIO3_IO15		0x19	/* PIN 22, GPIO 25 */
+				MX8MQ_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x19	/* PIN 36, GPIO 16 */
+				MX8MQ_IOMUXC_NAND_DATA05_GPIO3_IO11		0x19	/* PIN 37, GPIO 26 */
+				MX8MQ_IOMUXC_NAND_CE1_B_GPIO3_IO2		0x19	/* PIN 26, GPIO 8  */
+				MX8MQ_IOMUXC_NAND_CLE_GPIO3_IO5			0x19	/* PIN 29, GPIO 5  */
+				MX8MQ_IOMUXC_NAND_DATA04_GPIO3_IO10		0x19	/* PIN 31, GPIO 6  */
+				MX8MQ_IOMUXC_SAI2_TXC_GPIO4_IO25		0x19	/* PIN 12, GPIO 18 */
+				MX8MQ_IOMUXC_SAI2_RXFS_GPIO4_IO21		0x19	/* PIN 35, GPIO 19 */
+				MX8MQ_IOMUXC_SAI2_RXD0_GPIO4_IO23		0x19	/* PIN 38, GPIO 20 */
+				MX8MQ_IOMUXC_SAI2_TXD0_GPIO4_IO26		0x19	/* PIN 40, GPIO 21 */
+			>;
+		};
+
+		pinctrl_ecspi1: ecspi1grp {
+				fsl,pins = <
+				MX8MQ_IOMUXC_ECSPI1_SS0_GPIO5_IO9		0x16
+				MX8MQ_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x16
+				MX8MQ_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x16
+				MX8MQ_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x1816
+			>;
+		};
+
+		pinctrl_i2c2: i2c2grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_I2C2_SCL_I2C2_SCL			0x4000007f
+				MX8MQ_IOMUXC_I2C2_SDA_I2C2_SDA			0x4000007f
+			>;
+		};
+
+		pinctrl_i2c3: i2c3grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_I2C3_SCL_I2C3_SCL			0x4000007f
+				MX8MQ_IOMUXC_I2C3_SDA_I2C3_SDA			0x4000007f
+			>;
+		};
+
+		pinctrl_uart2: uart2grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_UART2_RXD_UART2_DCE_RX		0x49
+				MX8MQ_IOMUXC_UART2_TXD_UART2_DCE_TX		0x49
+			>;
+		};
+
+		pinctrl_pwm2: pwm1_grp {
+			fsl,pins = <
+					MX8MQ_IOMUXC_GPIO1_IO13_PWM2_OUT	0x06
+			>;
+		};
+
+		pinctrl_pwm4: pwm1_grp {
+			fsl,pins = <
+					MX8MQ_IOMUXC_GPIO1_IO15_PWM4_OUT	0x06
+			>;
+		};
+	};
+};
+
+&ecspi1{
+	fsl,spi-num-chipselects = < 1 >;
+	cs-gpios = <&gpio5 13 0 > ;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1 >;
+	status = "okay";
+	#address-cells=<1>;
+	#size-cells=<0>;
+	spidev@0x00{
+		#address-cellss=<1>;
+		#size-cells=<1>;
+		compatible = "spidev", "semtech,sx1301";
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+	};
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+};
+
+&i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c3>;
+	status = "okay";
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART2>;
+	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	status = "okay";
+};
+
+&pwm2 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pwm2>;
+        status = "okay";
+};
+
+&pwm4 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pwm4>;
+        status = "okay";
+};
