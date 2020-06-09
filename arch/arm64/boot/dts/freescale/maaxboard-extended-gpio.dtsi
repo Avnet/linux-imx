@@ -15,6 +15,9 @@
 /* 40-pin extended GPIO, expanded into SPI, I2C, PWM and other interfaces */
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	imx8mq-evk {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <

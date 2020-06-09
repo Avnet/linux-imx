@@ -132,16 +132,7 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog>;
-
 	imx8mq-evk {
-		pinctrl_hog: hoggrp {
-			fsl,pins = <
-				MX8MQ_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K  0x05
-			>;
-		};
-
 		pinctrl_gpio_leds: gpio_ledsgrp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_GPIO1_IO05_GPIO1_IO5           0x19
@@ -178,6 +169,7 @@
 			fsl,pins = <
 				MX8MQ_IOMUXC_SD2_RESET_B_GPIO2_IO19		0x19  /* WL_REG_ON */
 				MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12		0x19  /* WL_HOST_WAKE irq */
+				MX8MQ_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K  0x05 /* 32K CLK IN */
 			>;
 		};
 		pinctrl_reg3V3wf: reg3V3wfgrp {
