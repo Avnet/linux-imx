@@ -65,6 +65,11 @@
 			};
 	};
 
+    gpiomem {
+			compatible = "maaxboard,maaxboard-gpiomem";
+			status = "okay";
+	};
+
 	hdmi_audio: sound-hdmi {
 		compatible = "fsl,imx8mq-evk-cdnhdmi",
 				"fsl,imx-audio-cdnhdmi";
