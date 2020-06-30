@@ -48,42 +48,10 @@
 #include <linux/cdev.h>
 #include <linux/pagemap.h>
 #include <linux/io.h>
+#include <linux/fs.h>
+#include <linux/uaccess.h>
 
-#define DEVICE_NAME "maaxboard-gpiomem"
-#define DRIVER_NAME "gpiomem-maaxboard"
-#define DEVICE_MINOR 0
-
-#define MAAXBOARD_GPIO_BASE_ADDR	0x3020000
-#define MAAXBOARD_GPIO_BASE_SIZE	0x160000
-
-/*I.MX8MQ, I.MX8MM GPIO number:
-GPIO1 0-29
-GPIO2 0-20
-GPIO3 0-25
-GPIO4 0-31
-GPIO5 0-29
-total 139 */
-#define GPIO_IOMUX_BASE_ADDR			0x30330028  /*0x30330250*/
-#define GPIO_PAD_BASE_ADDR				0x30330290  /*0x30330418*/
-#define GPIO_PINMUX_AREA_SIZE			0x10000
-
-/*
-GPIO1  0x30200000-0x3020001C
-GPIO2  0x30210000-0x3021001C
-GPIO3  0x30220000-0x3022001C
-GPIO4  0x30230000-0x3023001C
-GPIO5  0x30240000-0x3024001C
-*/
-#define GPIO_FUNCTION_BASE_ADDR			0x30200000
-#define GPIO_FUNCTION_AREA_SIZE			0x60000
-
-#define GPIO_AREA_SIZE					0x200000
-
-
-struct maaxboard_gpiomem_instance {
-	unsigned long gpio_regs_phys;
-	struct device *dev;
-};
+#include "maaxboard-gpiomem.h"
 
 static struct cdev maaxboard_gpiomem_cdev;
 static dev_t maaxboard_gpiomem_devid;
@@ -91,13 +59,14 @@ static struct class *maaxboard_gpiomem_class;
 static struct device *maaxboard_gpiomem_dev;
 static struct maaxboard_gpiomem_instance *inst;
 
+static int 	maaxboard_gpiomem_pinmux;
+static int	maaxboard_gpiomem_ctrl;
 
 /****************************************************************************
 *
 *   GPIO mem chardev file ops
 *
 ***************************************************************************/
-
 static int maaxboard_gpiomem_open(struct inode *inode, struct file *file)
 {
 	int dev = iminor(inode);
@@ -128,24 +97,27 @@ static const struct vm_operations_struct maaxboard_gpiomem_vm_ops = {
 #endif
 };
 
-static int maaxboard_gpiomem_mmap(struct file *file, struct vm_area_struct *vma)
+int maaxboard_gpiomem_mmap_helper(struct file *file, struct vm_area_struct *vma)
 {
 	/* Ignore what the user says - they're getting the GPIO regs
 	   whether they like it or not! */
-	//unsigned long gpio_page = inst->gpio_regs_phys >> PAGE_SHIFT;
 	unsigned int offset = vma->vm_pgoff << PAGE_SHIFT;
-	unsigned int shm_addr = GPIO_FUNCTION_BASE_ADDR;
-	unsigned int shm_size = GPIO_AREA_SIZE ;
+	unsigned int shm_addr ;
+	unsigned int shm_size ;
 	unsigned int shm_pfn_addr,size = 0;
 
-	shm_pfn_addr = ((unsigned int )shm_addr >> PAGE_SHIFT );
-	printk( KERN_DEBUG"shm_addr=%#x, shm_size=%x, offset = %x, vm_start=%lx,  vm_flags=%lx, vm_page_prot=%lx\n",
-					shm_addr,
-					shm_size,
-					offset,
-					vma->vm_start,
-					vma->vm_flags,
-					pgprot_val(vma->vm_page_prot) );
+	if ( maaxboard_gpiomem_pinmux ){
+		shm_addr = GPIO_PINMUX_AREA_BASE;
+		shm_size = GPIO_PINMUX_AREA_SIZE;
+		shm_pfn_addr = ((unsigned int )shm_addr >> PAGE_SHIFT );
+	} else if (maaxboard_gpiomem_ctrl){
+		shm_addr = GPIO_FUNCTION_BASE_ADDR;
+		shm_size = GPIO_FUNCTION_AREA_SIZE;
+		shm_pfn_addr = ((unsigned int )shm_addr >> PAGE_SHIFT );
+	}else{
+		printk( "\nInvalid mmap command.\n" );
+		return -EINVAL;
+	}
 
 	if ( !shm_addr ){
 		return -ENXIO;
@@ -165,8 +137,8 @@ static int maaxboard_gpiomem_mmap(struct file *file, struct vm_area_struct *vma)
 	}
 
 	size = vma->vm_end - vma->vm_start;
-	vma->vm_flags |= VM_NORESERVE;
-	vma->vm_flags |= VM_IO;
+	//vma->vm_flags |= VM_RESERVED;//VM_NORESERVE
+  	vma->vm_flags |= VM_IO;
 
 	vma->vm_page_prot = pgprot_noncached (vma->vm_page_prot); //io memory is no cache 
 
@@ -185,12 +157,44 @@ static int maaxboard_gpiomem_mmap(struct file *file, struct vm_area_struct *vma)
 	return 0;
 }
 
+static int maaxboard_gpiomem_mmap( struct file* filep, struct vm_area_struct* vma )
+{
+	int ret;
+	ret = maaxboard_gpiomem_mmap_helper( filep, vma );
+	maaxboard_gpiomem_pinmux = 0;
+	maaxboard_gpiomem_ctrl = 0;
+
+	return ret;
+}
+
+static long maaxboard_gpiomem_ioctl( struct file *filp, unsigned int cmd, unsigned long arg )
+{	
+	switch (cmd)
+	{
+		case MAAX_IOC_MMAP_PINMUX:
+			maaxboard_gpiomem_pinmux = 1;
+			maaxboard_gpiomem_ctrl = 0;
+			break;
+						
+		case  MAAX_IOC_MMAP_CTRL:
+			maaxboard_gpiomem_pinmux = 0;
+			maaxboard_gpiomem_ctrl = 1;
+			break;
+
+		default:
+			printk( "ioctl(): invalid command=0x%x\n", cmd );
+			return -EINVAL;
+	}
+	return 0;
+}
+
 static const struct file_operations
 maaxboard_gpiomem_fops = {
 	.owner = THIS_MODULE,
 	.open = maaxboard_gpiomem_open,
 	.release = maaxboard_gpiomem_release,
 	.mmap = maaxboard_gpiomem_mmap,
+	.unlocked_ioctl = maaxboard_gpiomem_ioctl,
 };
 
 
@@ -199,17 +203,13 @@ maaxboard_gpiomem_fops = {
 *   Probe and remove functions
 *
 ***************************************************************************/
-
-
 static int maaxboard_gpiomem_probe(struct platform_device *pdev)
 {
 	int err;
 	void *ptr_err;
 	struct device *dev = &pdev->dev;
-	struct resource *ioresource;
 
 	/* Allocate buffers and instance data */
-
 	inst = kzalloc(sizeof(struct maaxboard_gpiomem_instance), GFP_KERNEL);
 
 	if (!inst) {
