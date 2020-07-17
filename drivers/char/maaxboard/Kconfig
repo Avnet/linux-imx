@@ -1,0 +1,12 @@
+#
+# charector drivers of maaxboard
+#
+
+config MAAX_GPIOMEM
+#	tristate "maaxboard gpiomem driver"
+	tristate "maaxboard gpiomem driver"
+#	depends on CONFIG_MAAXBOARD
+#	default y
+	help
+	  support gpiomem of maaxboard && maaxboard mini, and imx8mq/imx8mm.
+
