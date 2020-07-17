@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
  
-#include "maaxboard-mini.dts"
+#include "maaxboard-mini-mipi.dts"
 
 &usbotg1 {
 	dr_mode = "peripheral";
