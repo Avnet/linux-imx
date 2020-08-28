@@ -53,6 +53,9 @@ struct lt2911 {
 
 static int lt2911_attach_dsi(struct lt2911 *lt);
 
+//#undef  dev_dbg
+//#define dev_dbg dev_info
+
 static inline struct lt2911 *bridge_to_lt2911(struct drm_bridge *b)
 {
 	return container_of(b, struct lt2911, bridge);
@@ -227,7 +230,6 @@ static void lt2911_init(struct lt2911 *lt)
 		usleep_range(300000, 301000);
 		regmap_write(lt->regmap, 0xff, 0xd0);
 		regmap_read(lt->regmap, 0x87, &rd_val);
-
 		if(rd_val & 0x08) {
 			dev_dbg(lt->dev,"LT2911 pcr stable");
 			break;
@@ -349,6 +351,7 @@ static int lt2911_connector_get_modes(struct drm_connector *connector)
 {
 	struct lt2911 *lt = connector_to_lt2911(connector);
 	struct drm_display_mode *mode;
+	u32 bus_format = MEDIA_BUS_FMT_RGB888_1X24;
 	u32 bus_flags = 0;
 	int ret;
 
@@ -367,6 +370,15 @@ static int lt2911_connector_get_modes(struct drm_connector *connector)
 	mode->type |= DRM_MODE_TYPE_PREFERRED;
 	drm_mode_set_name(mode);
 	drm_mode_probed_add(connector, mode);
+	drm_mode_connector_list_update(connector);
+
+    connector->display_info.bus_flags = DRM_BUS_FLAG_DE_LOW |
+                        DRM_BUS_FLAG_PIXDATA_NEGEDGE;
+
+    ret = drm_display_info_set_bus_formats(&connector->display_info,
+                           &bus_format, 1);
+    if (ret)
+        return ret;
 
 	return 1;
 }
@@ -420,9 +432,11 @@ static int lt2911_bridge_attach(struct drm_bridge *bridge)
 	struct drm_connector *connector = &lt->connector;
 	int ret;
 
+  	lt->connector.polled = DRM_CONNECTOR_POLL_CONNECT;
+
 	ret = drm_connector_init(bridge->dev, connector,
 				 &lt2911_connector_funcs,
-				 DRM_MODE_CONNECTOR_HDMIA);
+				 DRM_MODE_CONNECTOR_DSI);
 	if (ret) {
 		dev_err(lt->dev, "failed to initialize connector\n");
 		return ret;
@@ -585,6 +599,7 @@ static const struct i2c_device_id lt2911_i2c_ids[] = {
 	{ "lt2911", 0 },
 	{ }
 };
+MODULE_DEVICE_TABLE(i2c, lt2911_i2c_ids);
 
 static const struct of_device_id lt2911_of_match[] = {
 	{ .compatible = "lontium,lt2911" },
