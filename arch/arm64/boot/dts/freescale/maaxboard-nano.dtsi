@@ -234,6 +234,12 @@
 			>;
 		};
 
+		pinctrl_csi: csigrp {
+			fsl,pins = <
+				MX8MN_IOMUXC_GPIO1_IO05_GPIO1_IO5			0x19
+				MX8MN_IOMUXC_GPIO1_IO06_GPIO1_IO6			0x19
+			>;
+		};
 	};
 };
 
@@ -374,6 +380,30 @@
 			};
 		};
 	};
+
+	ov5640_mipi: ov5640_mipi@3c {
+		compatible = "ovti,ov5640";
+		reg = <0x3c>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi>;
+		clocks = <&clk IMX8MN_CLK_CLKO1>;
+		clock-names = "xclk";
+		csi_id = <0>;
+		reset-gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;
+		powerdown-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		status = "okay";
+
+		port {
+			ov5640_ep: endpoint {
+				remote-endpoint = <&mipi1_sensor_ep>;
+				data-lanes = <1 2>;
+				clocks-lanes = <0>;
+			};
+		};
+	};
 };
 
 &i2c4 {
@@ -457,6 +487,22 @@
 
 &gpu {
 	status = "okay";
+};
+
+&mipi_csi_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	port@0 {
+		reg = <0>;
+		mipi1_sensor_ep: endpoint {
+			remote-endpoint = <&ov5640_ep>;
+			data-lanes = <2>;
+			csis-hs-settle = <13>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+		};
+	};
 };
 
 &isi_0 {
