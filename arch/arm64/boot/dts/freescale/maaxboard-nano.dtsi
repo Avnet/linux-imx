@@ -25,6 +25,37 @@
 		stdout-path = &uart2;
 	};
 
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		status = "okay";
+
+		sys_led {
+				label = "sys_led";
+				gpios = <&gpio3 25 GPIO_ACTIVE_HIGH>;
+				default-state = "on";
+				linux,default-trigger = "heartbeat";
+		};
+
+		usr_led {
+				label = "usr_led";
+				gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
+				default-state = "on";
+		};
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_keys>;
+
+		usr_key {
+				label = "usr_key";
+				gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+				linux,code = <BTN_0>;
+		};
+	};
 };
 
 &A53_0 {
@@ -40,6 +71,19 @@
 	pinctrl-names = "default";
 
 	imx8mn-evk {
+		pinctrl_gpio_leds: gpioledgrp {
+			fsl,pins = <
+				MX8MN_IOMUXC_SAI5_MCLK_GPIO3_IO25			0x19
+				MX8MN_IOMUXC_SAI5_RXFS_GPIO3_IO19			0x19
+			>;
+		};
+
+		pinctrl_gpio_keys: gpio_keysgrp {
+			fsl,pins = <
+				MX8MN_IOMUXC_GPIO1_IO07_GPIO1_IO7			0x144
+			>;
+		};
+
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
 				MX8MN_IOMUXC_ENET_MDC_ENET1_MDC				0x3
