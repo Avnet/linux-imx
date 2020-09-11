@@ -98,6 +98,8 @@ dtb-$(CONFIG_ARCH_FSL_IMX8MQ) += fsl-imx8mq-ddr3l-arm2.dtb \
 				 maaxboard-dcss-mipi.dtb \
 				 maaxboard-dcss-lvds.dtb \
 				 maaxboard-lcdif-lvds.dtb \
+				 maaxboard-lcdif-mipi.dtb \
+				 maaxboard-dual-display-hdmi-mipi.dtb \
 				 maaxboard-usb0-device.dtb \
 				 fsl-imx8mq-evk-b3.dtb \
 				 fsl-imx8mq-evk-m4.dtb \
