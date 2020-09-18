@@ -13,3 +13,4 @@
  */
 
 #include "maaxboard-mini-android.dtsi"
+#include "maaxboard-mini-max98357a.dtsi"

@@ -1,0 +1,88 @@
+/*
+ * Copyright 2019 EMBEST
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/ {
+    sound-amplifier {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "max98357-audio";
+		simple-audio-card,bitclock-master = <&dailink_cpu>;
+		simple-audio-card,frame-master = <&dailink_cpu>;
+		simple-audio-card,format = "i2s";
+		status = "okay";
+		simple-audio-card,widgets = "Speaker", "Speaker";
+		simple-audio-card,routing = "Speaker", "Speaker";
+
+		dailink_cpu: simple-audio-card,cpu {
+			sound-dai = <&sai3>;
+			system-clock-frequency = <883200>;
+			dai-tdm-slot-num = <2>;
+			dai-tdm-slot-width = <16>;
+		};
+
+		simple-audio-card,codec {
+			sound-dai = <&codec_amplifier>;
+		};
+	};
+
+    codec_amplifier: max98357a@0 {
+        #sound-dai-cells = <0>;
+		compatible = "maxim,max98357a";
+	};
+    
+    sound-micfil {
+		compatible = "fsl,imx-audio-micfil";
+		model = "imx-audio-micfil";
+		cpu-dai = <&micfil>;
+	};
+};
+
+&iomuxc {
+	imx8mq-evk {
+        pinctrl_sai3: sai3grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SAI3_TXFS_SAI3_TX_SYNC     0xd6
+				MX8MM_IOMUXC_SAI3_TXC_SAI3_TX_BCLK      0xd6
+				MX8MM_IOMUXC_SAI3_TXD_SAI3_TX_DATA0     0xd6
+				MX8MM_IOMUXC_SAI3_RXD_SAI3_RX_DATA0     0xd6
+			>;
+		};
+
+        pinctrl_pdm: pdmgrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SAI1_MCLK_PDM_CLK          0xd6
+				MX8MM_IOMUXC_SAI1_RXD0_PDM_DATA0        0xd6
+			>;
+		};
+	};
+};
+
+&sai3 {
+	pinctrl-names = "default";
+    #sound-dai-cells = <0>;
+	pinctrl-0 = <&pinctrl_sai3>;
+	assigned-clocks = <&clk IMX8MM_CLK_SAI3_SRC>,
+			<&clk IMX8MM_CLK_SAI3_DIV>;
+	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
+	assigned-clock-rates = <0>, <24576000>;
+	status = "okay";
+};
+
+&micfil {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pdm>;
+	assigned-clocks = <&clk IMX8MM_CLK_PDM_SRC>, <&clk IMX8MM_CLK_PDM_DIV>;
+	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
+	assigned-clock-rates = <0>, <196608000>;
+	status = "okay";
+};
