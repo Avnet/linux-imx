@@ -15,8 +15,25 @@
 #include "maaxboard-nano.dtsi"
 
 &mipi_dsi {
+	status = "okay";
+
 	panel@0 {
+		compatible = "ilitek,ili9881c";
+		reg = <0>;
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		enable-gpio = <&gpio1 13 GPIO_ACTIVE_HIGH>;
+		dsi-lanes = <2>;
 		status = "okay";
+	};
+};
+
+&iomuxc {
+	imx8mn-evk {
+		pinctrl_mipi_dsi_en: mipi_dsi_en {
+			fsl,pins = <
+				MX8MN_IOMUXC_GPIO1_IO13_GPIO1_IO13		  0x16  /* DSI_EN */
+			>;
+		};
 	};
 };
 
