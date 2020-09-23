@@ -14,6 +14,16 @@
 
 #include "maaxboard-nano.dtsi"
 
+/ {
+	backlight {
+			compatible = "pwm-backlight";
+			pwms = <&pwm1 0 40000 0>;
+			brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
+			default-brightness-level = <8>;
+			status = "okay";
+	};
+};
+
 &mipi_dsi {
 	status = "okay";
 
@@ -32,6 +42,12 @@
 		pinctrl_mipi_dsi_en: mipi_dsi_en {
 			fsl,pins = <
 				MX8MN_IOMUXC_GPIO1_IO13_GPIO1_IO13		  0x16  /* DSI_EN */
+			>;
+		};
+
+		pinctrl_pwm1: pwm1_grp {
+			fsl,pins = <
+				MX8MN_IOMUXC_GPIO1_IO08_PWM1_OUT   0x06
 			>;
 		};
 	};
