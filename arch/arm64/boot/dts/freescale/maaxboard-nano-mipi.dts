@@ -13,6 +13,7 @@
  */
 
 #include "maaxboard-nano.dtsi"
+#include "maaxboard-nano-extended-gpio.dtsi"
 
 / {
 	backlight {
