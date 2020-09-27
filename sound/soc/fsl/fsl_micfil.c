@@ -1675,7 +1675,7 @@ static int fsl_micfil_dai_probe(struct snd_soc_dai *cpu_dai)
 
 	/* set qsel to medium */
 	ret = regmap_update_bits(micfil->regmap, REG_MICFIL_CTRL2,
-				 MICFIL_CTRL2_QSEL_MASK, MICFIL_MEDIUM_QUALITY);
+				 MICFIL_CTRL2_QSEL_MASK, MICFIL_HIGH_QUALITY);
 	if (ret) {
 		dev_err(dev, "failed to set quality mode bits, reg 0x%X\n",
 			REG_MICFIL_CTRL2);
