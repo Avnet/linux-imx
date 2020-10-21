@@ -25,6 +25,15 @@
 		stdout-path = &uart2;
 	};
 
+	usdhc1_pwrseq: usdhc1_pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_wlanbt>;
+		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>,	 /* WiFi_REG_ON */
+		            <&gpio2 6 GPIO_ACTIVE_LOW>,      /* BT_REG_ON */
+					<&gpio2 7 GPIO_ACTIVE_LOW>;      /* BT_WAKE */
+	};
+
 	leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
@@ -157,10 +166,42 @@
 			>;
 		};
 
+		/*for BT*/
+		pinctrl_uart1: uart1grp {
+			fsl,pins = <
+				MX8MN_IOMUXC_UART1_RXD_UART1_DCE_RX			0x140
+				MX8MN_IOMUXC_UART1_TXD_UART1_DCE_TX			0x140
+				MX8MN_IOMUXC_UART3_RXD_UART1_DCE_CTS_B		0x140
+				MX8MN_IOMUXC_UART3_TXD_UART1_DCE_RTS_B		0x140
+			>;
+		};
+
+		/*for console*/
 		pinctrl_uart2: uart2grp {
 			fsl,pins = <
 				MX8MN_IOMUXC_UART2_RXD_UART2_DCE_RX			0x140
 				MX8MN_IOMUXC_UART2_TXD_UART2_DCE_TX			0x140
+			>;
+		};
+
+        pinctrl_wlanbt: wlanbtgrp {
+			fsl,pins = <
+				MX8MN_IOMUXC_SD1_RESET_B_GPIO2_IO10			0x19 /* wlan EN */
+				MX8MN_IOMUXC_SD1_DATA4_GPIO2_IO6			0x19 /* BT reg on */
+				MX8MN_IOMUXC_SD1_DATA5_GPIO2_IO7			0x19 /* BT wake */
+			>;
+		};
+
+		/*for wifi*/
+		pinctrl_usdhc1: usdhc1grp {
+			fsl,pins = <
+				MX8MN_IOMUXC_SD1_CLK_USDHC1_CLK				0x190
+				MX8MN_IOMUXC_SD1_CMD_USDHC1_CMD				0x1d0
+				MX8MN_IOMUXC_SD1_DATA0_USDHC1_DATA0			0x1d0
+				MX8MN_IOMUXC_SD1_DATA1_USDHC1_DATA1			0x1d0
+				MX8MN_IOMUXC_SD1_DATA2_USDHC1_DATA2			0x1d0
+				MX8MN_IOMUXC_SD1_DATA3_USDHC1_DATA3			0x1d0
+				MX8MN_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K  0x05 /* 32K CLK IN */
 			>;
 		};
 
@@ -489,9 +530,30 @@
 	status = "okay";
 };
 
-&uart2 { /* console */
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	status = "okay";
+};
+
+/* console */
+&uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
+	status = "okay";
+};
+
+/*wifi*/
+&usdhc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc1>;
+	/delete-property/ cd-gpios;
+	pm-ignore-notify;
+	keep-power-in-suspend;
+	non-removable;
+	cap-power-off-card;
+	bus-width = <4>;
+	mmc-pwrseq = <&usdhc1_pwrseq>;
 	status = "okay";
 };
 
