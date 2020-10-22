@@ -329,7 +329,7 @@
 &flexspi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi0>;
-	status = "disabled";
+	status = "okay";
 
 	flash0: mt25qu256aba@0 {
 		reg = <0>;
