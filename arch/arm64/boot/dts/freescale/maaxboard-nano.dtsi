@@ -205,6 +205,12 @@
 			>;
 		};
 
+		pinctrl_usdhc2_gpio: usdhc2grpgpio {
+			fsl,pins = <
+				MX8MN_IOMUXC_SD2_CD_B_GPIO2_IO12	0x1c4
+			>;
+		};
+
 		pinctrl_usdhc2: usdhc2grp {
 			fsl,pins = <
 				MX8MN_IOMUXC_SD2_CLK_USDHC2_CLK				0x190
@@ -214,7 +220,6 @@
 				MX8MN_IOMUXC_SD2_DATA2_USDHC2_DATA2			0x1d0
 				MX8MN_IOMUXC_SD2_DATA3_USDHC2_DATA3			0x1d0
 				MX8MN_IOMUXC_GPIO1_IO04_USDHC2_VSELECT		0x1d0
-				MX8MN_IOMUXC_SD2_CD_B_USDHC2_CD_B			0x1d0
 			>;
 		};
 
@@ -227,7 +232,6 @@
 				MX8MN_IOMUXC_SD2_DATA2_USDHC2_DATA2			0x1d4
 				MX8MN_IOMUXC_SD2_DATA3_USDHC2_DATA3			0x1d4
 				MX8MN_IOMUXC_GPIO1_IO04_USDHC2_VSELECT		0x1d0
-				MX8MN_IOMUXC_SD2_CD_B_USDHC2_CD_B			0x1d0
 			>;
 		};
 
@@ -240,7 +244,6 @@
 				MX8MN_IOMUXC_SD2_DATA2_USDHC2_DATA2			0x1d6
 				MX8MN_IOMUXC_SD2_DATA3_USDHC2_DATA3			0x1d6
 				MX8MN_IOMUXC_GPIO1_IO04_USDHC2_VSELECT		0x1d0
-				MX8MN_IOMUXC_SD2_CD_B_USDHC2_CD_B			0x1d0
 			>;
 		};
 
@@ -559,11 +562,12 @@
 
 &usdhc2 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	bus-width = <4>;
+	no-1-8-v;
 	status = "okay";
 };
 
