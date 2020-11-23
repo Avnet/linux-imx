@@ -1,0 +1,194 @@
+/*
+ * Copyright 2019 EMBEST
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/* 40-pin extended GPIO, expanded into SPI, I2C, PWM and other interfaces */
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	imx8mq-evk {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				/*Default GPIOs*/
+				MX8MQ_IOMUXC_NAND_READY_B_GPIO3_IO16	0x19	/* PIN 7,  GPIO 4  */
+				MX8MQ_IOMUXC_NAND_WE_B_GPIO3_IO17		0x19	/* PIN 11, GPIO 17 */
+				MX8MQ_IOMUXC_NAND_DATA02_GPIO3_IO8		0x19	/* PIN 13, GPIO 27 */
+				MX8MQ_IOMUXC_NAND_DATA03_GPIO3_IO9		0x19	/* PIN 15, GPIO 22 */
+				MX8MQ_IOMUXC_NAND_RE_B_GPIO3_IO15		0x19	/* PIN 22, GPIO 25 */
+				MX8MQ_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x19	/* PIN 36, GPIO 16 */
+				MX8MQ_IOMUXC_NAND_DATA05_GPIO3_IO11		0x19	/* PIN 37, GPIO 26 */
+				MX8MQ_IOMUXC_NAND_CE1_B_GPIO3_IO2		0x19	/* PIN 26, GPIO 8  */
+				MX8MQ_IOMUXC_NAND_CLE_GPIO3_IO5			0x19	/* PIN 29, GPIO 5  */
+				MX8MQ_IOMUXC_NAND_DATA04_GPIO3_IO10		0x19	/* PIN 31, GPIO 6  */
+			>;
+		};
+
+		pinctrl_ecspi1: ecspi1grp {
+				fsl,pins = <
+				MX8MQ_IOMUXC_ECSPI1_SS0_GPIO5_IO9		0x16
+				MX8MQ_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x16
+				MX8MQ_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x16
+				MX8MQ_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x1816
+			>;
+		};
+
+		pinctrl_i2c2: i2c2grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_I2C2_SCL_I2C2_SCL			0x4000007f
+				MX8MQ_IOMUXC_I2C2_SDA_I2C2_SDA			0x4000007f
+			>;
+		};
+
+		pinctrl_i2c3: i2c3grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_I2C3_SCL_I2C3_SCL			0x4000007f
+				MX8MQ_IOMUXC_I2C3_SDA_I2C3_SDA			0x4000007f
+			>;
+		};
+
+		pinctrl_uart2: uart2grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_UART2_RXD_UART2_DCE_RX		0x49
+				MX8MQ_IOMUXC_UART2_TXD_UART2_DCE_TX		0x49
+			>;
+		};
+
+		pinctrl_pwm2: pwm2_grp {
+			fsl,pins = <
+					MX8MQ_IOMUXC_GPIO1_IO13_PWM2_OUT	0x06
+			>;
+		};
+
+		pinctrl_pwm4: pwm4_grp {
+			fsl,pins = <
+					MX8MQ_IOMUXC_GPIO1_IO15_PWM4_OUT	0x06
+			>;
+		};
+
+		pinctrl_sai2: sai2grp {
+			fsl,pins = <
+					MX8MQ_IOMUXC_SAI2_TXFS_SAI2_TX_SYNC     0xd6
+					MX8MQ_IOMUXC_SAI2_TXC_SAI2_TX_BCLK      0xd6
+					MX8MQ_IOMUXC_SAI2_RXD0_SAI2_RX_DATA0    0xd6
+					MX8MQ_IOMUXC_SAI2_TXD0_SAI2_TX_DATA0    0xd6
+			>;
+		};
+	};
+};
+
+&ecspi1{
+	fsl,spi-num-chipselects = < 1 >;
+	cs-gpios = <&gpio5 13 0 > ;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1 >;
+	status = "okay";
+};
+
+&i2c2 {
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+
+	wm8960: wm8960@1a {
+		#sound-dai-cells = <0>;
+		compatible = "wlf,wm8960";
+		reg = <0x1a>;
+		clocks = <&wm8960_osc>;
+		clock-names = "mclk";
+		wlf,shared-lrclk;
+	};
+};
+
+&i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c3>;
+	status = "okay";
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART2>;
+	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	status = "okay";
+};
+
+&pwm2 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pwm2>;
+        status = "okay";
+};
+
+&pwm4 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pwm4>;
+        status = "okay";
+};
+
+/ {
+    sound-wm8960 {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "wm8960-sound-audio";
+		simple-audio-card,bitclock-master = <&dailink_master>;
+		simple-audio-card,frame-master = <&dailink_master>;
+		simple-audio-card,format = "i2s";
+		status = "okay";
+		simple-audio-card,widgets =
+                "Microphone", "Mic Jack",
+                "Line", "Line In",
+                "Line", "Line Out",
+                "Speaker", "Speaker",
+                "Headphone", "Headphone Jack";
+		simple-audio-card,routing =
+                "Headphone Jack", "HP_L",
+                "Headphone Jack", "HP_R",
+                "Speaker", "SPK_LP",
+                "Speaker", "SPK_LN",
+                "Speaker", "SPK_RP",
+                "Speaker", "SPK_RN",
+                "LINPUT1", "Mic Jack",
+                "LINPUT3", "Mic Jack",
+                "RINPUT1", "Mic Jack",
+                "RINPUT2", "Mic Jack",
+                "Mic Jack", "MICB";
+
+		simple-audio-card,cpu {
+			sound-dai = <&sai2>;
+		};
+		dailink_master: simple-audio-card,codec {
+			sound-dai = <&wm8960>;
+			clocks = <&wm8960_osc>;
+		};
+	};
+
+    wm8960_osc: wm8960_mclk {
+            compatible = "fixed-clock";
+            #clock-cells = <0>;
+            clock-frequency = <24000000>;
+            clock-output-names = "wm8960-mclk";
+    };
+};
+
+&sai2 {
+	pinctrl-names = "default";
+	#sound-dai-cells = <0>;
+	pinctrl-0 = <&pinctrl_sai2>;
+	assigned-clocks = <&clk IMX8MQ_CLK_SAI2>;
+	assigned-clock-parents = <&clk IMX8MQ_AUDIO_PLL1_OUT>;
+	assigned-clock-rates = <24576000>;
+	status = "okay";
+};

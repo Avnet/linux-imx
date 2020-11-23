@@ -536,6 +536,7 @@ config ADI
 	  driver include crash and makedumpfile.
 
 source "drivers/char/imx_amp/Kconfig"
+source "drivers/char/maaxboard/Kconfig"
 endmenu
 
 config RANDOM_TRUST_CPU

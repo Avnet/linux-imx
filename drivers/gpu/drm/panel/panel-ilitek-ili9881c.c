@@ -249,7 +249,7 @@ static const struct ili9881c_instr ili9881c_init[] = {
 	ILI9881C_COMMAND_INSTR(0xD1, 0x56),
 	ILI9881C_COMMAND_INSTR(0xD2, 0x66),
 	ILI9881C_COMMAND_INSTR(0xD3, 0x39),
-#if 0
+#if 1
 /* BIST mode (Built-in Self-test Pattern)*/
 	ILI9881C_SWITCH_PAGE_INSTR(4),
 	ILI9881C_COMMAND_INSTR(0x2d, 0x08),
@@ -450,7 +450,7 @@ static const struct drm_display_mode default_mode = {
 frame rate = 52.5Hz [2 data lanes: 50~60Hz]
 pclk=800M * 2lane / 24bpp =66.67M */
 static const struct display_timing ph720128t003_timing = {
-    .pixelclock = { 64000000, 67000000, 7100000 },
+    .pixelclock = { 64000000, 67000000, 71000000 },
 	.hactive = { 720, 720, 720 },
 	.hfront_porch = { 80, 120, 120 },
 	.hback_porch = { 10, 20, 60 },
@@ -477,13 +477,16 @@ static int ili9881c_get_modes(struct drm_panel *panel)
 	struct drm_connector *connector = panel->connector;
 	struct ili9881c_panel *tftcp = panel_to_ili9881c(panel);
 	struct drm_display_mode *mode;
+	u32 bus_format = MEDIA_BUS_FMT_RGB888_1X24;
+	int ret;
+
 #ifdef USE_DISPLAY_TIMINGS
 	struct videomode vm;
 	u32 *bus_flags = &connector->display_info.bus_flags;
 #endif
 
 #ifndef USE_DISPLAY_TIMINGS
-  dev_dbg(&tftcp->dsi->dev,"%s get drm_display_mode\n",__func__);
+	dev_dbg(&tftcp->dsi->dev,"%s get drm_display_mode\n",__func__);
 	mode = drm_mode_duplicate(panel->drm, &default_mode);
 	if (!mode) {
 		dev_err(&tftcp->dsi->dev, "failed to add mode %ux%ux@%u\n",
@@ -495,7 +498,7 @@ static int ili9881c_get_modes(struct drm_panel *panel)
 		drm_mode_set_name(mode);
 
 #else
-  dev_dbg(&tftcp->dsi->dev,"%s get display_timing\n",__func__);
+	dev_dbg(&tftcp->dsi->dev,"%s get display_timing\n",__func__);
 	videomode_from_timing(&ph720128t003_timing, &vm);
 
 	mode = drm_mode_create(connector->dev);
@@ -523,8 +526,11 @@ static int ili9881c_get_modes(struct drm_panel *panel)
 
 	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
 
-	drm_display_info_set_bus_formats(&connector->display_info,
-			bus_formats, ARRAY_SIZE(bus_formats));
+    ret = drm_display_info_set_bus_formats(&connector->display_info,
+                           &bus_format, 1);
+    if (ret < 0) {
+        return ret;
+	}
 
 	drm_mode_probed_add(connector, mode);
 
