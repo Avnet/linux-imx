@@ -14,7 +14,7 @@
 #include <video/mipi_display.h>
 #include <video/videomode.h>
 
-#define USE_DISPLAY_TIMINGS
+/* #define USE_DISPLAY_TIMINGS */
 
 struct ili9881c_panel {
 	struct drm_panel	panel;
@@ -249,7 +249,7 @@ static const struct ili9881c_instr ili9881c_init[] = {
 	ILI9881C_COMMAND_INSTR(0xD1, 0x56),
 	ILI9881C_COMMAND_INSTR(0xD2, 0x66),
 	ILI9881C_COMMAND_INSTR(0xD3, 0x39),
-#if 1
+#if 0
 /* BIST mode (Built-in Self-test Pattern)*/
 	ILI9881C_SWITCH_PAGE_INSTR(4),
 	ILI9881C_COMMAND_INSTR(0x2d, 0x08),
@@ -477,7 +477,6 @@ static int ili9881c_get_modes(struct drm_panel *panel)
 	struct drm_connector *connector = panel->connector;
 	struct ili9881c_panel *tftcp = panel_to_ili9881c(panel);
 	struct drm_display_mode *mode;
-	u32 bus_format = MEDIA_BUS_FMT_RGB888_1X24;
 	int ret;
 
 #ifdef USE_DISPLAY_TIMINGS
@@ -519,20 +518,18 @@ static int ili9881c_get_modes(struct drm_panel *panel)
 		*bus_flags |= DRM_BUS_FLAG_PIXDATA_POSEDGE;
 #endif
 
+	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+	drm_mode_probed_add(connector, mode);
+
 	mode->width_mm = 153;
 	mode->height_mm = 90;
 	connector->display_info.width_mm = mode->width_mm;
 	connector->display_info.height_mm = mode->height_mm;
-
-	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
-
     ret = drm_display_info_set_bus_formats(&connector->display_info,
-                           &bus_format, 1);
+                           bus_formats, ARRAY_SIZE(bus_formats));
     if (ret < 0) {
         return ret;
 	}
-
-	drm_mode_probed_add(connector, mode);
 
 	return 1;
 }
@@ -557,7 +554,7 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 	mipi_dsi_set_drvdata(dsi, tftcp);
 	tftcp->dsi = dsi;
 
-	dsi->mode_flags =  MIPI_DSI_MODE_VIDEO_HSE | MIPI_DSI_MODE_VIDEO | MIPI_DSI_CLOCK_NON_CONTINUOUS;
+	dsi->mode_flags =  MIPI_DSI_MODE_VIDEO_HSE | MIPI_DSI_MODE_VIDEO;
 	/* non-burst mode with sync pulse */
 	dsi->mode_flags |= MIPI_DSI_MODE_VIDEO_SYNC_PULSE;
 	dsi->format = MIPI_DSI_FMT_RGB888;
