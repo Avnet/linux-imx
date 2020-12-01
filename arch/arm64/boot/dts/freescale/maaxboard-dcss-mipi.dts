@@ -16,10 +16,6 @@
 #include "maaxboard-extended-gpio.dtsi"
 #include "maaxboard-dsi-common.dtsi"
 
-&i2c1 {
-	status = "disabled";
-};
-
 &dcss {
 	status = "okay";
 	port@0 {

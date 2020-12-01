@@ -124,6 +124,13 @@
 		reset-post-delay-ms = <40>;
 		#reset-cells = <0>;
 	};
+
+	pmic_osc: clock-pmic {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <32768>;
+		clock-output-names = "pmic_osc";
+	};
 };
 
 &iomuxc {
@@ -357,139 +364,160 @@
 };
 
 &i2c1 {
-	clock-frequency = <400000>;
+	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
 
-	bd71837: pmic@4b {
+	pmic: pmic@4b {
 		compatible = "rohm,bd71837";
 		reg = <0x4b>;
+		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pmic>;
+		clocks = <&pmic_osc>;
+		clock-names = "osc";
+		clock-output-names = "pmic_clk";
 		interrupt-parent = <&gpio1>;
 		interrupts = <7 GPIO_ACTIVE_LOW>;
+		interrupt-names = "irq";
 		rohm,reset-snvs-powered;
 
 		regulators {
 			buck1_reg: BUCK1 {
-                regulator-name = "buck1";
-                regulator-min-microvolt = <700000>;
-                regulator-max-microvolt = <1300000>;
-                regulator-boot-on;
-                regulator-always-on;
-                regulator-ramp-delay = <1250>;
-                rohm,dvs-run-voltage = <900000>;
-                rohm,dvs-idle-voltage = <850000>;
-                rohm,dvs-suspend-voltage = <800000>;
-            };
-            buck2_reg: BUCK2 {
-                regulator-name = "buck2";
-                regulator-min-microvolt = <700000>;
-                regulator-max-microvolt = <1300000>;
-                regulator-boot-on;
-                regulator-always-on;
-                regulator-ramp-delay = <1250>;
-                rohm,dvs-run-voltage = <1000000>;
-                rohm,dvs-idle-voltage = <900000>;
-            };
-            buck3_reg: BUCK3 {
-                regulator-name = "buck3";
-                regulator-min-microvolt = <700000>;
-                regulator-max-microvolt = <1300000>;
-                regulator-boot-on;
-                rohm,dvs-run-voltage = <1000000>;
-            };
-            buck4_reg: BUCK4 {
-                regulator-name = "buck4";
-                regulator-min-microvolt = <700000>;
-                regulator-max-microvolt = <1300000>;
-                regulator-boot-on;
-                rohm,dvs-run-voltage = <1000000>;
-            };
-            buck5_reg: BUCK5 {
-                regulator-name = "buck5";
-                regulator-min-microvolt = <900000>;
-                regulator-max-microvolt = <1000000>;
-                regulator-boot-on;
+				regulator-name = "buck1";
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <1300000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
-            buck6_reg: BUCK6 {
-                regulator-name = "buck6";
-                regulator-min-microvolt = <3000000>;
-                regulator-max-microvolt = <3300000>;
-                regulator-boot-on;
-				regulator-always-on;
-            };
-            buck7_reg: BUCK7 {
-                regulator-name = "buck7";
-                regulator-min-microvolt = <1800000>;
-                regulator-max-microvolt = <1800000>;
-                regulator-boot-on;
-            };
-            buck8_reg: BUCK8 {
-                regulator-name = "buck8";
-                regulator-min-microvolt = <1200000>;
-                regulator-max-microvolt = <1200000>;
-                regulator-boot-on;
-				regulator-always-on;
-            };
+				regulator-ramp-delay = <1250>;
+				rohm,dvs-run-voltage = <900000>;
+				rohm,dvs-idle-voltage = <850000>;
+				rohm,dvs-suspend-voltage = <800000>;
+			};
 
-            ldo1_reg: LDO1 {
-                regulator-name = "ldo1";
-                regulator-min-microvolt = <3000000>;
-                regulator-max-microvolt = <3300000>;
-                regulator-boot-on;
+			buck2_reg: BUCK2 {
+				regulator-name = "buck2";
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <1300000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
-            ldo2_reg: LDO2 {
-                regulator-name = "ldo2";
-                regulator-min-microvolt = <900000>;
-                regulator-max-microvolt = <900000>;
-                regulator-boot-on;
+				regulator-ramp-delay = <1250>;
+				rohm,dvs-run-voltage = <1000000>;
+				rohm,dvs-idle-voltage = <900000>;
+			};
+
+			buck3_reg: BUCK3 {
+				regulator-name = "buck3";
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <1300000>;
+				regulator-boot-on;
+				rohm,dvs-run-voltage = <1000000>;
+				regulator-enable-ramp-delay= <180>;
+			};
+
+			buck4_reg: BUCK4 {
+				regulator-name = "buck4";
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <1300000>;
+				rohm,dvs-run-voltage = <1000000>;
+				regulator-boot-on;
+				regulator-enable-ramp-delay= <180>;
+			};
+
+			buck5_reg: BUCK5 {
+				regulator-name = "buck5";
+				regulator-min-microvolt = <900000>;
+				regulator-max-microvolt = <1000000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
-            ldo3_reg: LDO3 {
-                regulator-name = "ldo3";
-                regulator-min-microvolt = <1800000>;
-                regulator-max-microvolt = <1800000>;
-                regulator-boot-on;
+			};
+
+			buck6_reg: BUCK6 {
+				regulator-name = "buck6";
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
-            ldo4_reg: LDO4 {
-                regulator-name = "ldo4";
-                regulator-min-microvolt = <900000>;
-                regulator-max-microvolt = <900000>;
-                regulator-boot-on;
+			};
+
+			buck7_reg: BUCK7 {
+				regulator-name = "buck7";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1900000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
-            ldo5_reg: LDO5 {
-                regulator-name = "ldo5";
-                regulator-min-microvolt = <2500000>;
-                regulator-max-microvolt = <2500000>;
-                regulator-boot-on;
+			};
+
+			buck8_reg: BUCK8 {
+				regulator-name = "buck8";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <1300000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
-            ldo6_reg: LDO6 {
-                regulator-name = "ldo6";
-                regulator-min-microvolt = <900000>;
-                regulator-max-microvolt = <900000>;
-                regulator-boot-on;
+			};
+
+			ldo1_reg: LDO1 {
+				regulator-name = "ldo1";
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
-            ldo7_reg: LDO7 {
-                regulator-name = "ldo7";
-                regulator-min-microvolt = <3000000>;
-                regulator-max-microvolt = <3300000>;
-                regulator-boot-on;
+			};
+
+			ldo2_reg: LDO2 {
+				regulator-name = "ldo2";
+				regulator-min-microvolt = <900000>;
+				regulator-max-microvolt = <900000>;
+				regulator-boot-on;
 				regulator-always-on;
-            };
+			};
+
+			ldo3_reg: LDO3 {
+				regulator-name = "ldo3";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1900000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			ldo4_reg: LDO4 {
+				regulator-name = "ldo4";
+				regulator-min-microvolt = <900000>;
+				regulator-max-microvolt = <1000000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			ldo5_reg: LDO5 {
+				regulator-name = "ldo5";
+				regulator-min-microvolt = <2500000>;
+				regulator-max-microvolt = <2600000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			ldo6_reg: LDO6 {
+				regulator-name = "ldo6";
+				regulator-min-microvolt = <900000>;
+				regulator-max-microvolt = <1000000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			ldo7_reg: LDO7 {
+				regulator-name = "ldo7";
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
 		};
 	};
 
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
 		reg = <0x3c>;
-		status = "okay";
+		status = "disabled";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_csi1>;
 		clocks = <&clk IMX8MQ_CLK_CLKO2>;
