@@ -309,6 +309,7 @@
 	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
 	non-removable;
 	no-sdio;
+	no-1-8-v;
 	bus-width = <4>;
 	status = "okay";
 };
