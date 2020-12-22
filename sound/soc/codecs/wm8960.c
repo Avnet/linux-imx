@@ -18,7 +18,6 @@
 #include <linux/clk.h>
 #include <linux/i2c.h>
 #include <linux/slab.h>
-#include <linux/pm_runtime.h>
 #include <sound/core.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
@@ -137,7 +136,6 @@ struct wm8960_priv {
 	int freq_in;
 	bool is_stream_in_use[2];
 	struct wm8960_data pdata;
-	bool quick_probe;
 };
 
 #define wm8960_reset(c)	regmap_write(c, WM8960_RESET, 0)
@@ -410,6 +408,7 @@ SND_SOC_DAPM_PGA("OUT3 VMID", WM8960_POWER2, 1, 0, NULL, 0),
 };
 
 static const struct snd_soc_dapm_route audio_paths[] = {
+	{ "Left Boost Mixer", NULL , "MICB"},
 	{ "Left Boost Mixer", "LINPUT1 Switch", "LINPUT1" },
 	{ "Left Boost Mixer", "LINPUT2 Switch", "LINPUT2" },
 	{ "Left Boost Mixer", "LINPUT3 Switch", "LINPUT3" },
@@ -419,6 +418,7 @@ static const struct snd_soc_dapm_route audio_paths[] = {
 	{ "Left Input Mixer", NULL, "LINPUT2" },
 	{ "Left Input Mixer", NULL, "LINPUT3" },
 
+	{ "Right Boost Mixer", NULL , "MICB"},
 	{ "Right Boost Mixer", "RINPUT1 Switch", "RINPUT1" },
 	{ "Right Boost Mixer", "RINPUT2 Switch", "RINPUT2" },
 	{ "Right Boost Mixer", "RINPUT3 Switch", "RINPUT3" },
@@ -613,6 +613,10 @@ static const int bclk_divs[] = {
  *		- lrclk      = sysclk / dac_divs
  *		- 10 * bclk  = sysclk / bclk_divs
  *
+ *	If we cannot find an exact match for (sysclk, lrclk, bclk)
+ *	triplet, we relax the bclk such that bclk is chosen as the
+ *	closest available frequency greater than expected bclk.
+ *
  * @wm8960_priv: wm8960 codec private data
  * @mclk: MCLK used to derive sysclk
  * @sysclk_idx: sysclk_divs index for found sysclk
@@ -630,7 +634,7 @@ int wm8960_configure_sysclk(struct wm8960_priv *wm8960, int mclk,
 {
 	int sysclk, bclk, lrclk;
 	int i, j, k;
-	int diff;
+	int diff, closest = mclk;
 
 	/* marker for no match */
 	*bclk_idx = -1;
@@ -654,6 +658,12 @@ int wm8960_configure_sysclk(struct wm8960_priv *wm8960, int mclk,
 					*bclk_idx = k;
 					break;
 				}
+				if (diff > 0 && closest > diff) {
+					*sysclk_idx = i;
+					*dac_idx = j;
+					*bclk_idx = k;
+					closest = diff;
+				}
 			}
 			if (k != ARRAY_SIZE(bclk_divs))
 				break;
@@ -670,6 +680,10 @@ int wm8960_configure_sysclk(struct wm8960_priv *wm8960, int mclk,
  *		- sysclk      = lrclk * dac_divs
  *		- freq_out    = sysclk * sysclk_divs
  *		- 10 * sysclk = bclk * bclk_divs
+ *
+ * 	If we cannot find an exact match for (sysclk, lrclk, bclk)
+ * 	triplet, we relax the bclk such that bclk is chosen as the
+ * 	closest available frequency greater than expected bclk.
  *
  * @codec: codec structure
  * @freq_in: input frequency used to derive freq out via PLL
@@ -688,11 +702,12 @@ int wm8960_configure_pll(struct snd_soc_codec *codec, int freq_in,
 {
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	int sysclk, bclk, lrclk, freq_out;
-	int diff, best_freq_out;
+	int diff, closest, best_freq_out;
 	int i, j, k;
 
 	bclk = wm8960->bclk;
 	lrclk = wm8960->lrclk;
+	closest = freq_in;
 
 	best_freq_out = -EINVAL;
 	*sysclk_idx = *dac_idx = *bclk_idx = -1;
@@ -714,6 +729,13 @@ int wm8960_configure_pll(struct snd_soc_codec *codec, int freq_in,
 					*dac_idx = j;
 					*bclk_idx = k;
 					return freq_out;
+				}
+				if (diff > 0 && closest > diff) {
+					*sysclk_idx = i;
+					*dac_idx = j;
+					*bclk_idx = k;
+					closest = diff;
+					best_freq_out = freq_out;
 				}
 			}
 		}
@@ -842,7 +864,8 @@ static int wm8960_hw_params(struct snd_pcm_substream *substream,
 
 	wm8960->is_stream_in_use[tx] = true;
 
-	if (!wm8960->is_stream_in_use[!tx])
+	if (snd_soc_codec_get_bias_level(codec) == SND_SOC_BIAS_ON &&
+	    !wm8960->is_stream_in_use[!tx])
 		return wm8960_configure_clocking(codec);
 
 	return 0;
@@ -932,8 +955,7 @@ static int wm8960_set_bias_level_out3(struct snd_soc_codec *codec,
 
 			/* Enable & ramp VMID at 2x50k */
 			snd_soc_update_bits(codec, WM8960_POWER1, 0x80, 0x80);
-			if(wm8960->quick_probe == false)
-				msleep(100);
+			msleep(100);
 
 			/* Enable VREF */
 			snd_soc_update_bits(codec, WM8960_POWER1, WM8960_VREF,
@@ -1102,6 +1124,11 @@ static bool is_pll_freq_available(unsigned int source, unsigned int target)
 	target *= 4;
 	Ndiv = target / source;
 
+	if (Ndiv < 6) {
+		source >>= 1;
+		Ndiv = target / source;
+	}
+
 	if ((Ndiv < 6) || (Ndiv > 12))
 		return false;
 
@@ -1212,9 +1239,6 @@ static int wm8960_set_dai_pll(struct snd_soc_dai *codec_dai, int pll_id,
 	if (pll_id == WM8960_SYSCLK_AUTO)
 		return 0;
 
-	if (is_pll_freq_available(freq_in, freq_out))
-		return -EINVAL;
-
 	return wm8960_set_pll(codec, freq_in, freq_out);
 }
 
@@ -1265,6 +1289,9 @@ static int wm8960_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 {
 	struct snd_soc_codec *codec = dai->codec;
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
+
+	clk_id = WM8960_SYSCLK_PLL;
+	wm8960->freq_in = freq;
 
 	switch (clk_id) {
 	case WM8960_SYSCLK_MCLK:
@@ -1374,8 +1401,6 @@ static int wm8960_i2c_probe(struct i2c_client *i2c,
 	struct wm8960_data *pdata = dev_get_platdata(&i2c->dev);
 	struct wm8960_priv *wm8960;
 	int ret;
-	int repeat_reset = 10;
-	struct device_node *np = i2c->dev.of_node;
 
 	wm8960 = devm_kzalloc(&i2c->dev, sizeof(struct wm8960_priv),
 			      GFP_KERNEL);
@@ -1397,16 +1422,7 @@ static int wm8960_i2c_probe(struct i2c_client *i2c,
 	else if (i2c->dev.of_node)
 		wm8960_set_pdata_from_of(i2c, &wm8960->pdata);
 
-	if (of_property_read_bool(np, "quick-probe"))
-		wm8960->quick_probe = true;
-
-	dev_info(&i2c->dev, "%s(), quick probe %d\n", __func__, wm8960->quick_probe);
-
-	do {
-		ret = wm8960_reset(wm8960->regmap);
-		repeat_reset--;
-	} while (repeat_reset > 0 && ret != 0);
-
+	ret = wm8960_reset(wm8960->regmap);
 	if (ret != 0) {
 		dev_err(&i2c->dev, "Failed to issue reset\n");
 		return ret;
@@ -1434,9 +1450,22 @@ static int wm8960_i2c_probe(struct i2c_client *i2c,
 	regmap_update_bits(wm8960->regmap, WM8960_LOUT2, 0x100, 0x100);
 	regmap_update_bits(wm8960->regmap, WM8960_ROUT2, 0x100, 0x100);
 
-	i2c_set_clientdata(i2c, wm8960);
+	/* other configuration */
+    regmap_update_bits(wm8960->regmap, WM8960_LINPATH, 0x108, 0x108);
+    regmap_update_bits(wm8960->regmap, WM8960_RINPATH, 0x108, 0x108);
+    regmap_update_bits(wm8960->regmap, WM8960_LOUTMIX, 0x100, 0x100);
+    regmap_update_bits(wm8960->regmap, WM8960_ROUTMIX, 0x100, 0x100);
+    regmap_update_bits(wm8960->regmap, WM8960_MONOMIX1, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_MONOMIX2, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_LOUT2, 0x165, 0x165);
+    regmap_update_bits(wm8960->regmap, WM8960_ROUT2, 0x165, 0x165);
+    regmap_update_bits(wm8960->regmap, WM8960_MONO, 0x40, 0x40);
+    regmap_update_bits(wm8960->regmap, WM8960_INBMIX1, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_INBMIX2, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_BYPASS1, 0x50, 0x50);
+    regmap_update_bits(wm8960->regmap, WM8960_BYPASS2, 0x50, 0x50);
 
-	pm_runtime_enable(&i2c->dev);
+	i2c_set_clientdata(i2c, wm8960);
 
 	ret = snd_soc_register_codec(&i2c->dev,
 			&soc_codec_dev_wm8960, &wm8960_dai, 1);
@@ -1449,35 +1478,6 @@ static int wm8960_i2c_remove(struct i2c_client *client)
 	snd_soc_unregister_codec(&client->dev);
 	return 0;
 }
-
-#ifdef CONFIG_PM
-static int wm8960_runtime_resume(struct device *dev)
-{
-	struct wm8960_priv *wm8960 = dev_get_drvdata(dev);
-	int ret;
-
-	ret = clk_prepare_enable(wm8960->mclk);
-	if (ret) {
-		dev_err(dev, "Failed to enable MCLK: %d\n", ret);
-		return ret;
-	}
-	return 0;
-}
-
-static int wm8960_runtime_suspend(struct device *dev)
-{
-	struct wm8960_priv *wm8960 = dev_get_drvdata(dev);
-
-	clk_disable_unprepare(wm8960->mclk);
-
-	return 0;
-}
-#endif
-
-static const struct dev_pm_ops wm8960_pm = {
-	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
-	SET_RUNTIME_PM_OPS(wm8960_runtime_suspend, wm8960_runtime_resume, NULL)
-};
 
 static const struct i2c_device_id wm8960_i2c_id[] = {
 	{ "wm8960", 0 },
@@ -1495,7 +1495,6 @@ static struct i2c_driver wm8960_i2c_driver = {
 	.driver = {
 		.name = "wm8960",
 		.of_match_table = wm8960_of_match,
-		.pm = &wm8960_pm,
 	},
 	.probe =    wm8960_i2c_probe,
 	.remove =   wm8960_i2c_remove,

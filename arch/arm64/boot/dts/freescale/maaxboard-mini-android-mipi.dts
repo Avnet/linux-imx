@@ -13,4 +13,4 @@
  */
 
 #include "maaxboard-mini-android.dtsi"
-#include "maaxboard-mini-max98357a.dtsi"
+#include "maaxboard-mini-wm8960.dtsi"
