@@ -101,14 +101,6 @@
 	pinctrl-0 = <&pinctrl_ecspi1 &pinctrl_ecspi1_cs>;
 	cs-gpios = <&gpio5 9 0 > ;
 	status = "okay";
- 
-	spidev@0x00{
-		#address-cellss=<1>;
-		#size-cells=<1>;
-		compatible = "spidev", "semtech,sx1301";
-		spi-max-frequency = <20000000>;
-		reg = <0>;
-	};
 };
 
 &i2c2 {

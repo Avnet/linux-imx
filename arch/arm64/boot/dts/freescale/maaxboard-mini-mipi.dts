@@ -15,13 +15,7 @@
 #include "maaxboard-mini.dtsi"
 #include "maaxboard-mini-extended-gpio.dtsi"
 
-&lcdif {
-	status = "okay";
-};
-
 &mipi_dsi {
-	status = "okay";
-
 	panel@0 {
 		compatible = "ilitek,ili9881c";
 		reg = <0>;
