@@ -1,0 +1,90 @@
+/*
+ * Copyright 2019 EMBEST
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "maaxboard.dtsi"
+#include "maaxboard-extended-gpio.dtsi"
+#include "maaxboard-dsi-common.dtsi"
+
+/ {
+	display-subsystem {
+		status = "disabled";
+	};
+
+	sound-hdmi {
+		status = "disabled";
+	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 40000 0>;
+		brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <8>;
+		status = "disabled";
+	};
+};
+
+&dcss {
+	status = "disabled";
+};
+
+&hdmi {
+	status = "disabled";
+};
+
+&lcdif {
+	status = "okay";
+	max-res = <1280>, <1280>;
+
+	port@0 {
+		dcss_lcdif_dsi: endpoint {
+			remote-endpoint = <&mipi_dsi_in>;
+		};
+	};
+
+};
+
+&mipi_dsi {
+	status = "okay";
+
+	panel@0 {
+		compatible = "ilitek,ili9881c";
+		reg = <0>;
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		enable-gpio = <&gpio3 12 GPIO_ACTIVE_HIGH>;
+		dsi-lanes = <2>;
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mipi_dsi_out>;
+			};
+		};
+	};
+
+	ports {
+		port@1 {
+			reg = <1>;
+			mipi_dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&pwm1 {
+        status = "okay";
+};
+
+&backlight {
+	status = "okay";
+};
