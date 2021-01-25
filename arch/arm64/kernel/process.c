@@ -189,6 +189,9 @@ void machine_restart(char *cmd)
 	local_irq_disable();
 	smp_send_stop();
 
+#ifdef CONFIG_MFD_ROHM_BD718X7_RST
+	do_kernel_restart(cmd);
+#endif
 	/*
 	 * UpdateCapsule() depends on the system being reset via
 	 * ResetSystem().

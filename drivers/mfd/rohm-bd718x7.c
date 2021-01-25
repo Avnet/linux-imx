@@ -18,6 +18,11 @@
 #include <linux/regmap.h>
 #include <linux/types.h>
 
+#ifdef CONFIG_MFD_ROHM_BD718X7_RST
+#include <linux/reboot.h>
+static struct bd718xx *bd718x7_pm;
+#endif
+
 static struct gpio_keys_button button = {
 	.code = KEY_POWER,
 	.gpio = -1,
@@ -80,6 +85,25 @@ static const struct regmap_config bd718xx_regmap_config = {
 	.max_register = BD718XX_MAX_REGISTER - 1,
 	.cache_type = REGCACHE_RBTREE,
 };
+
+#ifdef CONFIG_MFD_ROHM_BD718X7_RST
+static int bd718x7_reset_handle(struct notifier_block *this,
+			    unsigned long mode, void *cmd)
+{
+	//regmap_write(->chip.regmap, BD718XX_REG_SWRESET, BD718XX_SWRESET_RESET);
+	regmap_update_bits(bd718x7_pm->chip.regmap,
+					 BD718XX_REG_SWRESET,
+					 BD718XX_SWRESET_RESET_MASK,
+					 BD718XX_SWRESET_RESET);
+
+	return NOTIFY_DONE;
+}
+
+static struct notifier_block bd718x7_restart_handler = {
+        .notifier_call = bd718x7_reset_handle,
+        .priority = 192,
+};
+#endif
 
 static int bd718xx_init_press_duration(struct bd718xx *bd718xx)
 {
@@ -176,6 +200,16 @@ static int bd718xx_i2c_probe(struct i2c_client *i2c,
 	if (ret)
 		dev_err(&i2c->dev, "Failed to create subdevices\n");
 
+#ifdef CONFIG_MFD_ROHM_BD718X7_RST
+	bd718x7_pm = bd718xx;
+
+	ret = register_restart_handler(&bd718x7_restart_handler);
+	if (ret) {
+		dev_err(&i2c->dev, "cannot register restart handler, %d\n", ret);
+		return ret;
+	}
+#endif
+
 	return ret;
 }
 
@@ -210,6 +244,11 @@ subsys_initcall(bd718xx_i2c_init);
 
 static void __exit bd718xx_i2c_exit(void)
 {
+#ifdef CONFIG_MFD_ROHM_BD718X7_RST
+	bd718x7_pm = NULL;
+	unregister_restart_handler(&bd718x7_restart_handler);
+#endif
+
 	i2c_del_driver(&bd718xx_i2c_driver);
 }
 module_exit(bd718xx_i2c_exit);
