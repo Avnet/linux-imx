@@ -51,6 +51,7 @@ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-lx2160a-rdb.dtb
 dtb-$(CONFIG_ARCH_MXC) += maaxboard-dcss-hdmi.dtb maaxboard-usb0-device.dtb
 dtb-$(CONFIG_ARCH_MXC) += maaxboard-dcss-mipi.dtb
 dtb-$(CONFIG_ARCH_MXC) += maaxboard-lcdif-mipi.dtb
+dtb-$(CONFIG_ARCH_MXC) += maaxboard-multi-display.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += maaxboard-nano-mipi.dtb
 dtb-$(CONFIG_ARCH_MXC) += maaxboard-mini-mipi.dtb maaxboard-mini-lvds.dtb maaxboard-mini-device.dtb
