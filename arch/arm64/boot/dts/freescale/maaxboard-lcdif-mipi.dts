@@ -16,42 +16,14 @@
 #include "maaxboard-extended-gpio.dtsi"
 #include "maaxboard-dsi-common.dtsi"
 
-/ {
-	display-subsystem {
-		status = "disabled";
-	};
-
-	sound-hdmi {
-		status = "disabled";
-	};
-
-	backlight: backlight {
-		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 40000 0>;
-		brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
-		default-brightness-level = <8>;
-		status = "disabled";
-	};
-};
-
-&dcss {
-	status = "disabled";
-};
-
-&hdmi {
-	status = "disabled";
-};
-
 &lcdif {
 	status = "okay";
-	max-res = <1280>, <1280>;
 
 	port@0 {
 		dcss_lcdif_dsi: endpoint {
 			remote-endpoint = <&mipi_dsi_in>;
 		};
 	};
-
 };
 
 &mipi_dsi {
@@ -86,5 +58,9 @@
 };
 
 &backlight {
+	status = "okay";
+};
+
+&ft5426 {
 	status = "okay";
 };
