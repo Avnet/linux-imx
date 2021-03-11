@@ -20,7 +20,7 @@ struct ili9881c_panel {
 	struct drm_panel	panel;
 	struct mipi_dsi_device	*dsi;
 
-	struct gpio_desc	*enable_gpio;
+	struct regulator	*vcc_en;
 	struct gpio_desc	*reset_gpio;
 };
 
@@ -322,9 +322,9 @@ static void ili9881c_reset(struct ili9881c_panel *tftcp)
 	/* Reset 5ms */
 	if (tftcp->reset_gpio) {
 		dev_dbg(&tftcp->dsi->dev,"reset the chip\n");
-		gpiod_set_value(tftcp->reset_gpio, 0);
+		gpiod_set_value_cansleep(tftcp->reset_gpio, 0);
 		usleep_range(5000, 10000);
-		gpiod_set_value(tftcp->reset_gpio, 1);
+		gpiod_set_value_cansleep(tftcp->reset_gpio, 1);
 		usleep_range(20000, 25000);
 	}
 }
@@ -332,8 +332,15 @@ static void ili9881c_reset(struct ili9881c_panel *tftcp)
 static int ili9881c_prepare(struct drm_panel *panel)
 {
 	struct ili9881c_panel *tftcp = panel_to_ili9881c(panel);
+	int ret;
 
 	dev_dbg(&tftcp->dsi->dev,"%s\n",__func__);
+
+	ret = regulator_enable(tftcp->vcc_en);
+	if (ret) {
+	   dev_err(&tftcp->dsi->dev, "Failed to enable vcc supply: %d\n", ret);
+	   return ret;
+	}
 
     ili9881c_reset(tftcp);
 
@@ -418,13 +425,18 @@ static int ili9881c_disable(struct drm_panel *panel)
 static int ili9881c_unprepare(struct drm_panel *panel)
 {
 	struct ili9881c_panel *tftcp = panel_to_ili9881c(panel);
+	int ret;
 
 	dev_dbg(&tftcp->dsi->dev,"%s\n",__func__);
+	if (tftcp->reset_gpio) {
+		gpiod_set_value_cansleep(tftcp->reset_gpio, 1);
+		usleep_range(5000, 10000);
+		gpiod_set_value_cansleep(tftcp->reset_gpio, 0);
+	}
 
-	if (tftcp->enable_gpio != NULL)
-		gpiod_set_value(tftcp->enable_gpio, 0);
-	if (tftcp->reset_gpio != NULL)
-		gpiod_set_value(tftcp->reset_gpio, 0);
+	ret = regulator_disable(tftcp->vcc_en);
+	if (ret)
+		return ret;
 
 	return 0;
 }
@@ -559,13 +571,12 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 	dsi->mode_flags |= MIPI_DSI_MODE_VIDEO_SYNC_PULSE;
 	dsi->format = MIPI_DSI_FMT_RGB888;
 
-	tftcp->enable_gpio = devm_gpiod_get(&dsi->dev, "enable", GPIOD_OUT_HIGH);
-	if (IS_ERR(tftcp->enable_gpio)) {
-		tftcp->enable_gpio = NULL;
-		dev_dbg(&dsi->dev, "Couldn't get our power GPIO\n");
-		return PTR_ERR(tftcp->enable_gpio);
-	} else {
-		gpiod_set_value(tftcp->enable_gpio, 1);
+	tftcp->vcc_en = devm_regulator_get(&dsi->dev, "vcc");
+	if (IS_ERR(tftcp->vcc_en)) {
+	   ret = PTR_ERR(tftcp->vcc_en);
+	   if (ret != -EPROBE_DEFER)
+			   dev_err(&dsi->dev, "Failed to request vcc regulator: %d\n", ret);
+	   return ret;
 	}
 
 	tftcp->reset_gpio = devm_gpiod_get_optional(&dsi->dev, "reset", GPIOD_OUT_HIGH);
