@@ -19,16 +19,11 @@
 	panel@0 {
 		compatible = "ilitek,ili9881c";
 		reg = <0>;
-		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
-		enable-gpio = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+		vcc-supply = <&reg_mipi_en>;
 		dsi-lanes = <2>;
 		status = "okay";
 	};
 };
-
-/*&backlight {
-		status = "okay";
-};*/
 
 &i2c4 {
 	clock-frequency = <400000>;
