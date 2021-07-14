@@ -150,3 +150,9 @@ dtb-$(CONFIG_ARCH_MXC) += imx8dxl-evk.dtb imx8dxl-evk-rpmsg.dtb \
 			  imx8dxl-ddr3-evk.dtb
 dtb-$(CONFIG_ARCH_S32) += s32v234-evb.dtb \
 			  s32v234-sbc.dtb
+
+# supported overlay
+DTC_FLAGS_maaxboard-base := -@
+dtb-$(CONFIG_ARCH_MXC) += maaxboard-base.dtb
+subdir-$(CONFIG_ARCH_MXC) += overlays
+
