@@ -1267,6 +1267,8 @@ static int wm8960_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 	struct snd_soc_component *component = dai->component;
 	struct wm8960_priv *wm8960 = snd_soc_component_get_drvdata(component);
 
+	clk_id = WM8960_SYSCLK_PLL;
+	wm8960->freq_in = freq;
 	switch (clk_id) {
 	case WM8960_SYSCLK_MCLK:
 		snd_soc_component_update_bits(component, WM8960_CLOCK1,
@@ -1453,6 +1455,21 @@ static int wm8960_i2c_probe(struct i2c_client *i2c,
 			   wm8960->pdata.hp_cfg[1] << 5);
 	regmap_update_bits(wm8960->regmap, WM8960_ADDCTL1, 3,
 			   wm8960->pdata.hp_cfg[2]);
+
+	/* other configuration */
+    regmap_update_bits(wm8960->regmap, WM8960_LINPATH, 0x108, 0x108);
+    regmap_update_bits(wm8960->regmap, WM8960_RINPATH, 0x108, 0x108);
+    regmap_update_bits(wm8960->regmap, WM8960_LOUTMIX, 0x100, 0x100);
+    regmap_update_bits(wm8960->regmap, WM8960_ROUTMIX, 0x100, 0x100);
+    regmap_update_bits(wm8960->regmap, WM8960_MONOMIX1, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_MONOMIX2, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_LOUT2, 0x165, 0x165);
+    regmap_update_bits(wm8960->regmap, WM8960_ROUT2, 0x165, 0x165);
+    regmap_update_bits(wm8960->regmap, WM8960_MONO, 0x40, 0x40);
+    regmap_update_bits(wm8960->regmap, WM8960_INBMIX1, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_INBMIX2, 0x0, 0x0);
+    regmap_update_bits(wm8960->regmap, WM8960_BYPASS1, 0x50, 0x50);
+    regmap_update_bits(wm8960->regmap, WM8960_BYPASS2, 0x50, 0x50);
 
 	i2c_set_clientdata(i2c, wm8960);
 

@@ -641,6 +641,9 @@ static int pwm_backlight_probe(struct platform_device *pdev)
 		data->dft_brightness = data->max_brightness;
 	}
 
+	if (of_property_read_bool(node, "enable-pwm-on"))
+		pwm_enable(pb->pwm);
+
 	bl->props.brightness = data->dft_brightness;
 	bl->props.power = pwm_backlight_initial_power_state(pb);
 	backlight_update_status(bl);
