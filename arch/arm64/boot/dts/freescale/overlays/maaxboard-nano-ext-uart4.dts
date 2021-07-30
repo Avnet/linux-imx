@@ -1,0 +1,50 @@
+/*
+ * Copyright 2021 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mn-clock.h>
+#include "../imx8mn-pinfunc.h"
+
+/* 40-pin extended GPIO, expanded into SPI, I2C, PWM and other interfaces */
+
+/ {
+	compatible = "avnet,maaxboard-nano", "fsl,imx8mn";
+
+	fragment@0 {
+		target = <&iomuxc>;
+		__overlay__ {
+			imx8mq-evk {
+				pinctrl_uart4: uart4grp {
+					fsl,pins = <
+						MX8MN_IOMUXC_UART4_TXD_UART4_DCE_TX		0x140
+						MX8MN_IOMUXC_UART4_RXD_UART4_DCE_RX		0x140
+					>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&uart4>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_uart4>;
+			assigned-clocks = <&clk IMX8MN_CLK_UART4>;
+			assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_80M>;
+			status = "okay";
+		};
+	};
+};

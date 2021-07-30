@@ -1,0 +1,71 @@
+/*
+ * Copyright 2021 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "avnet,maaxboard-nano", "fsl,imx8mn";
+
+	fragment@0 {
+		target = <&mipi_dsi>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+			panel@0 {
+				compatible = "ilitek,ili9881c";
+				reg = <0>;
+				vcc-supply = <&reg_mipi_en>;
+				dsi-lanes = <2>;
+				status = "okay";
+			};
+		};
+	};
+	
+	fragment@1 {
+		target = <&lcdif>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@2 {
+		target = <&pwm1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@3 {
+		target = <&backlight>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@4 {
+		target = <&i2c4>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@5 {
+		target = <&ft5426>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};
