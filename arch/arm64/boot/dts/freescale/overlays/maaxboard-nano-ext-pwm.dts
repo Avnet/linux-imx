@@ -26,15 +26,15 @@
 		target = <&iomuxc>;
 		__overlay__ {
 			imx8mq-evk {
-				pinctrl_pwm1: pwm1_grp {
+				pinctrl_pwm2: pwm2_grp {
 					fsl,pins = <
-						MX8MN_IOMUXC_SPDIF_EXT_CLK_PWM1_OUT		0x06
+						MX8MN_IOMUXC_SPDIF_RX_PWM2_OUT		0x06 /* PIN 32,  GPIO5_IO4· */
 					>;
 				};
 
-				pinctrl_pwm2: pwm2_grp {
+				pinctrl_pwm3: pwm3_grp {
 					fsl,pins = <
-						MX8MN_IOMUXC_SPDIF_RX_PWM2_OUT		0x06
+						MX8MN_IOMUXC_SPDIF_TX_PWM3_OUT		0x06 /* PIN 33,  GPIO5_IO3· */
 					>;
 				};
 			};
@@ -42,19 +42,19 @@
 	};
 
 	fragment@1 {
-		target = <&pwm1>;
+		target = <&pwm2>;
 		__overlay__ {
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_pwm1>;
+			pinctrl-0 = <&pinctrl_pwm2>;
 			status = "okay";
 		};
 	};
 
 	fragment@2 {
-		target = <&pwm2>;
+		target = <&pwm3>;
 		__overlay__ {
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_pwm2>;
+			pinctrl-0 = <&pinctrl_pwm3>;
 			status = "okay";
 		};
 	};

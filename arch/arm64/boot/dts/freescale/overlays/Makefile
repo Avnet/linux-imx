@@ -12,4 +12,4 @@ dtb-y += maaxboard-nano-ext-i2c.dtbo
 dtb-y += maaxboard-nano-ext-pwm.dtbo
 dtb-y += maaxboard-nano-ext-spi.dtbo
 dtb-y += maaxboard-nano-ext-uart4.dtbo
-dtb-y += maaxboard-nano-btsco.dtbo
+dtb-y += maaxboard-nano-ext-sai3.dtbo
