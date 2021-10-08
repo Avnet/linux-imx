@@ -554,6 +554,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
 	/delete-property/ cd-gpios;
+	max-frequency = <25000000>;
 	pm-ignore-notify;
 	keep-power-in-suspend;
 	non-removable;
