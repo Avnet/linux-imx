@@ -38,6 +38,7 @@ MODULE_PARM_DESC(debug, "debug level");
 
 /* SYSCTL Registers */
 #define CHIP_ID_REG                          0x0000
+#define RESET_REG                            0x301A
 #define RESET_AND_MISC_CONTROL               0x001A
 #define MCU_BOOT_MODE                        0x001C
 #define PHYSICAL_ADDRESS_ACCESS              0x098A
@@ -45,6 +46,7 @@ MODULE_PARM_DESC(debug, "debug level");
 #define ACCESS_CTL_STAT                      0x0982
 #define COMMAND_REGISTER                     0x0080
 #define SYSMGR_NEXT_STATE                    0xDC00
+#define SYSMGR_CURRENT_STATE                 0xDC01
 
 /* PLL Settings Registers */
 #define CAM_SYSCTL_PLL_ENABLE                0xCA12
@@ -163,9 +165,9 @@ static const as0260_reg regs_1920x1080[] = {
 	{ CAM_SENSOR_CFG_Y_ADDR_END, 0x045F, 2 },
 	{ CAM_SENSOR_CFG_X_ADDR_END, 0x07A7, 2 },
 
-	{ CAM_SENSOR_CFG_FRAME_LENGTH_LINES, 0x0491, 2 },
 	{ CAM_SENSOR_CFG_FINE_INTEG_TIME_MIN, 0x0336, 2 },
 	{ CAM_SENSOR_CFG_FINE_INTEG_TIME_MAX, 0x01BE, 2 },
+	{ CAM_SENSOR_CFG_FRAME_LENGTH_LINES, 0x0491, 2 },
 	{ CAM_SENSOR_CFG_FINE_CORRECTION, 0x00D4, 2 },
 	{ CAM_SENSOR_CFG_CPIPE_LAST_ROW, 0x043B, 2 },
 	{ CAM_SENSOR_CONTROL_READ_MODE, 0x0002, 2 },
@@ -198,9 +200,9 @@ static const as0260_reg regs_640x480[] = {
 	{ CAM_SENSOR_CFG_Y_ADDR_END, 0x045D, 2 },
 	{ CAM_SENSOR_CFG_X_ADDR_END, 0x06AD, 2 },
 
-	{ CAM_SENSOR_CFG_FRAME_LENGTH_LINES, 0x026D, 2 },
 	{ CAM_SENSOR_CFG_FINE_INTEG_TIME_MIN, 0x06A4, 2 },
-	{ CAM_SENSOR_CFG_FINE_INTEG_TIME_MAX, 0x088C, 2 },
+	{ CAM_SENSOR_CFG_FINE_INTEG_TIME_MAX, 0x085E, 2 },
+	{ CAM_SENSOR_CFG_FRAME_LENGTH_LINES, 0x04DA, 2 },
 	{ CAM_SENSOR_CFG_FINE_CORRECTION, 0x01D9, 2 },
 	{ CAM_SENSOR_CFG_CPIPE_LAST_ROW, 0x021B, 2 },
 	{ CAM_SENSOR_CONTROL_READ_MODE, 0x0012, 2 },
@@ -211,12 +213,11 @@ static const as0260_reg regs_640x480[] = {
 	{ CAM_CROP_WINDOW_HEIGHT, 0x0218, 2 },
 	{ CAM_OUTPUT_WIDTH, 640, 2 },
 	{ CAM_OUTPUT_HEIGHT, 480, 2 },
-	{ CAM_OUTPUT_FORMAT, 0x4010, 2 },
 
 	{ CAM_STAT_AWB_CLIP_WINDOW_XSTART, 0x0000, 2 },
 	{ CAM_STAT_AWB_CLIP_WINDOW_YSTART, 0x0000, 2 },
-	{ CAM_STAT_AWB_CLIP_WINDOW_XEND, 0x027F, 2 },
-	{ CAM_STAT_AWB_CLIP_WINDOW_YEND, 0x01DF, 2 },
+	{ CAM_STAT_AWB_CLIP_WINDOW_XEND, 639, 2 },
+	{ CAM_STAT_AWB_CLIP_WINDOW_YEND, 479, 2 },
 
 	{ CAM_STAT_AE_INITIAL_WINDOW_XSTART, 0x0000, 2 },
 	{ CAM_STAT_AE_INITIAL_WINDOW_YSTART, 0x0000, 2 },
@@ -324,6 +325,8 @@ static const as0260_reg output_mipi_yuyv_reg[] = {
 	/* Swap order of Y and Cb/Cr values */
 	{ OUTPUT_FORMAT_CONFIGURATION, 0x0002, 2 },
 };
+
+static int as0260_s_stream(struct v4l2_subdev *sd, int enable);
 
 static int as0260_read_reg(struct v4l2_subdev *sd, u16 addr, u16 * val, u8 reg_size)
 {
@@ -519,7 +522,7 @@ static int as0260_init(struct v4l2_subdev *sd)
 	/* configure MIPI frequency to 768MHz */
 	ret += as0260_pll_config(sd, sensor->mclk / 1000000);
 
-	/* configure AS0260 work as 1920x1080 and 30fps as default  */
+	/* configure AS0260 work on 1920x1080@30fps as default  */
 	ret += as0260_write_reg_arr(sd, regs_1920x1080, ARRAY_SIZE(regs_1920x1080));
 	ret += as0260_set_framerate(sd, 30);
 
@@ -528,6 +531,9 @@ static int as0260_init(struct v4l2_subdev *sd)
 
 	/* let all the registers changes take effect */
 	ret += as0260_change_config(sd);
+
+	/* place the sensor in low power mode */
+	as0260_s_stream(sd, 0);
 
 	return ret;
 }
@@ -740,17 +746,14 @@ static int as0260_s_stream(struct v4l2_subdev *sd, int enable)
 
 	as0260_dbg("s_stream: %d\n", enable);
 
+	as0260_read_reg(sd, RESET_REG, &regval, 2);
 	if (enable) {
-		ret += as0260_write_reg(sd, 0x098E, 0xDC00, 2);
-		ret += as0260_write_reg(sd, 0xDC00, 0x34, 2);
-		ret += as0260_write_reg(sd, 0x0080, 0x8002, 2);
+		regval |= (1 << 2);
+		ret += as0260_write_reg(sd, RESET_REG, regval, 2);
 	} else {
-		ret += as0260_write_reg(sd, 0x098E, 0xDC00, 2);
-		ret += as0260_write_reg(sd, 0xDC00, 0x40, 2);
-		ret += as0260_write_reg(sd, 0x0080, 0x8002, 2);
+		regval &= ~(1 << 2);
+		ret += as0260_write_reg(sd, RESET_REG, regval, 2);
 	}
-
-	as0260_read_reg(sd, 0xDC01, &regval, 2);
 
 	return ret;
 }
