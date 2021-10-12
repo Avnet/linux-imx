@@ -14,5 +14,6 @@ dtb-y += maaxboard-ext-spi.dtbo
 dtb-y += maaxboard-ext-uart2.dtbo
 dtb-y += maaxboard-ext-wm8960.dtbo
 dtb-y += maaxboard-ov5640.dtbo
+dtb-y += maaxboard-as0260.dtbo
 dtb-y += maaxboard-usb0-device.dtbo
 
