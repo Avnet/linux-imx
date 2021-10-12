@@ -93,7 +93,7 @@ MODULE_PARM_DESC(debug, "debug level");
 
 enum as0260_fmt {
 	AS0260_FMT_1920x1080,	/* 1080P  */
-	AS0260_FMT_640x480,	/* VGA */
+	AS0260_FMT_1280x720,	/* 720P */
 	AS0260_FMT_MAX,
 };
 
@@ -145,14 +145,14 @@ as0260_format_t as0260_formats[AS0260_FMT_MAX] = {
 				  .field = V4L2_FIELD_NONE,
 				  .colorspace = V4L2_COLORSPACE_JPEG,
 				   },
-	[AS0260_FMT_640x480] = {
-				.mode = AS0260_FMT_640x480,
-				.width = 640,
-				.height = 480,
+	[AS0260_FMT_1280x720] = {
+				.mode = AS0260_FMT_1280x720,
+				.width = 1280,
+				.height = 720,
 				.mbus_code = MEDIA_BUS_FMT_YUYV8_2X8,
 				.field = V4L2_FIELD_NONE,
 				.colorspace = V4L2_COLORSPACE_JPEG,
-				 }
+				 },
 };
 
 /* register configure table for 1920x1080 */
@@ -189,6 +189,43 @@ static const as0260_reg regs_1920x1080[] = {
 	{ CAM_STAT_AE_INITIAL_WINDOW_XEND, 0x017F, 2 },
 	{ CAM_STAT_AE_INITIAL_WINDOW_YEND, 0x00D7, 2 },
 };
+
+/* register configure table for 1280x720 */
+static const as0260_reg regs_1280x720[] = {
+	/* logic address access */
+	{ LOGICAL_ADDRESS_ACCESS, 0x4800, 2 },
+
+	{ CAM_SENSOR_CFG_Y_ADDR_START, 0x0020, 2 },
+	{ CAM_SENSOR_CFG_X_ADDR_START, 0x0020, 2 },
+	{ CAM_SENSOR_CFG_Y_ADDR_END, 0x045F, 2 },
+	{ CAM_SENSOR_CFG_X_ADDR_END, 0x07A7, 2 },
+
+	{ CAM_SENSOR_CFG_FINE_INTEG_TIME_MIN, 0x0336, 2 },
+	{ CAM_SENSOR_CFG_FINE_INTEG_TIME_MAX, 0x0A7B, 2 },
+	{ CAM_SENSOR_CFG_FRAME_LENGTH_LINES, 0x0491, 2 },
+	{ CAM_SENSOR_CFG_FINE_CORRECTION, 0x00D4, 2 },
+	{ CAM_SENSOR_CFG_CPIPE_LAST_ROW, 0x043B, 2 },
+	{ CAM_SENSOR_CONTROL_READ_MODE, 0x0002, 2 },
+
+	{ CAM_CROP_WINDOW_XOFFSET, 0x0000, 2 },
+	{ CAM_CROP_WINDOW_YOFFSET, 0x0000, 2 },
+	{ CAM_CROP_WINDOW_WIDTH, 1920, 2 },
+	{ CAM_CROP_WINDOW_HEIGHT, 1080, 2 },
+	{ CAM_OUTPUT_WIDTH, 1280, 2 },
+	{ CAM_OUTPUT_HEIGHT, 720, 2 },
+
+	{ CAM_STAT_AWB_CLIP_WINDOW_XSTART, 0x0000, 2 },
+	{ CAM_STAT_AWB_CLIP_WINDOW_YSTART, 0x0000, 2 },
+	{ CAM_STAT_AWB_CLIP_WINDOW_XEND, 1279, 2 },
+	{ CAM_STAT_AWB_CLIP_WINDOW_YEND, 719, 2 },
+
+	{ CAM_STAT_AE_INITIAL_WINDOW_XSTART, 0x0000, 2 },
+	{ CAM_STAT_AE_INITIAL_WINDOW_YSTART, 0x0000, 2 },
+	{ CAM_STAT_AE_INITIAL_WINDOW_XEND, 0x00FF, 2 },
+	{ CAM_STAT_AE_INITIAL_WINDOW_YEND, 0x008F, 2 },
+};
+
+
 
 /* register configure table for 640x480 */
 static const as0260_reg regs_640x480[] = {
@@ -643,8 +680,8 @@ static int as0260_s_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *a)
 
 		if (sensor->fmt->mode == AS0260_FMT_1920x1080) {
 			ret += as0260_write_reg_arr(sd, regs_1920x1080, ARRAY_SIZE(regs_1920x1080));
-		} else if (sensor->fmt->mode == AS0260_FMT_640x480) {
-			ret += as0260_write_reg_arr(sd, regs_640x480, ARRAY_SIZE(regs_640x480));
+        } else if (sensor->fmt->mode == AS0260_FMT_1280x720) {
+			ret += as0260_write_reg_arr(sd, regs_1280x720, ARRAY_SIZE(regs_1280x720));
 		}
 
 		ret += as0260_set_framerate(sd, frame_rate);
