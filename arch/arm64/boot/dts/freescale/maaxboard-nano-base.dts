@@ -63,17 +63,9 @@
 
 	wlan_pwrseq: sdio-pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;      /* WL_REG_ON */
+		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;      /* WF_BT_PWR */
 	};
 
-    bt_reset: bt-reset {
-		compatible = "gpio-reset";
-		reset-gpios = <&gpio2 6 GPIO_ACTIVE_LOW>;      /* BT_REG_ON */
-		reset-delay-us = <2000>;
-		reset-post-delay-ms = <40>;
-		#reset-cells = <0>;
-	};
-	
 	reg_mipi_en: regulator-mipi-vcc {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -203,10 +195,7 @@
 
 		pinctrl_wlan: wlangrpbt {
 			fsl,pins = <
-                MX8MN_IOMUXC_SD1_RESET_B_GPIO2_IO10			0x19 /* WL_REG_ON */
-                MX8MN_IOMUXC_SD1_DATA5_GPIO2_IO7			0x19 /* WL_HOST_WAKE irq */
-                MX8MN_IOMUXC_SD1_DATA4_GPIO2_IO6			0x19 /* BT_REG_ON */
-                MX8MN_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K	0x141 /* SUSCLK_IN 32k */
+                MX8MN_IOMUXC_SD1_RESET_B_GPIO2_IO10			0x19 /* WF_BT_PWR */
 			>;
 		};
 
@@ -549,7 +538,6 @@
 	assigned-clocks = <&clk IMX8MN_CLK_UART1>;
 	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_80M>;
 	fsl,uart-has-rtscts;
-	resets = <&bt_reset>;
 	status = "okay";
 };
 
