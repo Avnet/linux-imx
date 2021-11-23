@@ -4,6 +4,7 @@
 DTC_FLAGS += -@
 
 dtb-y += maaxboard-mipi.dtbo
+dtb-y += maaxboard-as0260.dtbo
 dtb-y += maaxboard-dual-display.dtbo
 dtb-y += maaxboard-ext-gpio.dtbo
 dtb-y += maaxboard-ext-i2c.dtbo
