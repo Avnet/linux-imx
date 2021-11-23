@@ -1,0 +1,141 @@
+/*
+ * Copyright 2021 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "avnet,maaxboard", "fsl,imx8mq";
+
+	fragment@0 {
+		target = <&dcss>;
+		__overlay__ {
+			status = "okay";
+			port@0 {
+				dcss_out: endpoint {
+					remote-endpoint = <&hdmi_in>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&mipi_dsi>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+			panel@0 {
+				compatible = "ilitek,ili9881c";
+				reg = <0>;
+				vcc-supply = <&reg_mipi_en>;
+				dsi-lanes = <2>;
+
+				port {
+					panel_in: endpoint {
+						remote-endpoint = <&mipi_dsi_out>;
+					};
+				};
+			};
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				port@0 {
+					reg = <0>;
+					mipi_dsi_in: endpoint {
+						remote-endpoint = <&lcdif_dsi>;
+					};
+				};
+				port@1 {
+					reg = <1>;
+					mipi_dsi_out: endpoint {
+						remote-endpoint = <&panel_in>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&lcdif>;
+		__overlay__ {
+			status = "okay";
+
+			port@0 {
+				lcdif_dsi: endpoint {
+					remote-endpoint = <&mipi_dsi_in>;
+				};
+			};
+		};
+	};
+
+	fragment@3 {
+		target = <&hdmi>;
+		__overlay__ {
+			compatible = "cdn,imx8mq-hdmi";
+			lane-mapping = <0xe4>;
+			status = "okay";
+
+			port@1 {
+				hdmi_in: endpoint {
+					remote-endpoint = <&dcss_out>;
+				};
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&hdmi_audio>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@5 {
+		target = <&sai4>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@6 {
+		target = <&pwm1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@7 {
+		target = <&backlight>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@8 {
+		target = <&i2c4>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@9 {
+		target = <&ft5426>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};
+

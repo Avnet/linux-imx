@@ -1,0 +1,65 @@
+/*
+ * Copyright 2021 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "../imx8mq-pinfunc.h"
+
+/* 40-pin extended GPIO, expanded into SPI, I2C, PWM and other interfaces */
+
+/ {
+	compatible = "avnet,maaxboard", "fsl,imx8mq";
+
+	fragment@0 {
+		target = <&iomuxc>;
+		__overlay__ {
+			imx8mq-evk {
+				pinctrl_i2c2: i2c2grp {
+					fsl,pins = <
+						MX8MQ_IOMUXC_I2C2_SCL_I2C2_SCL			0x4000007f
+						MX8MQ_IOMUXC_I2C2_SDA_I2C2_SDA			0x4000007f
+					>;
+				};
+
+				pinctrl_i2c3: i2c3grp {
+					fsl,pins = <
+						MX8MQ_IOMUXC_I2C3_SCL_I2C3_SCL			0x4000007f
+						MX8MQ_IOMUXC_I2C3_SDA_I2C3_SDA			0x4000007f
+					>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&i2c2>;
+		__overlay__ {
+			clock-frequency = <400000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2c2>;
+			status = "okay";
+		};
+	};
+
+	fragment@2 {
+		target = <&i2c3>;
+		__overlay__ {
+			clock-frequency = <100000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2c3>;
+			status = "okay";
+		};
+	};
+};

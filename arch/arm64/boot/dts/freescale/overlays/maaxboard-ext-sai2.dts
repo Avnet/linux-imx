@@ -1,0 +1,53 @@
+/*
+ * Copyright 2021 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mq-clock.h>
+#include "../imx8mq-pinfunc.h"
+
+/* 40-pin extended GPIO, expanded into SPI, I2C, PWM and other interfaces */
+
+/ {
+	compatible = "avnet,maaxboard", "fsl,imx8mq";
+
+	fragment@0 {
+		target = <&iomuxc>;
+		__overlay__ {
+			imx8mq-evk {
+				pinctrl_sai2: sai2grp {
+					fsl,pins = <
+						MX8MQ_IOMUXC_SAI2_TXFS_SAI2_TX_SYNC     0xd6
+						MX8MQ_IOMUXC_SAI2_TXC_SAI2_TX_BCLK      0xd6
+						MX8MQ_IOMUXC_SAI2_RXD0_SAI2_RX_DATA0    0xd6
+						MX8MQ_IOMUXC_SAI2_TXD0_SAI2_TX_DATA0    0xd6
+					>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&sai2>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_sai2>;
+			assigned-clocks = <&clk IMX8MQ_CLK_SAI2>;
+			assigned-clock-parents = <&clk IMX8MQ_AUDIO_PLL1_OUT>;
+			assigned-clock-rates = <24576000>;
+			status = "okay";
+		};
+	};
+};

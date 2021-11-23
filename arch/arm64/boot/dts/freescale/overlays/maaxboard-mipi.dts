@@ -1,0 +1,120 @@
+/*
+ * Copyright 2021 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mq-clock.h>
+
+/ {
+	compatible = "avnet,maaxboard", "fsl,imx8mq";
+
+	fragment@0 {
+		target = <&dcss>;
+		__overlay__ {
+			clocks = <&clk IMX8MQ_CLK_DISP_APB_ROOT>,
+						<&clk IMX8MQ_CLK_DISP_AXI_ROOT>,
+						<&clk IMX8MQ_CLK_DISP_RTRM_ROOT>,
+						<&clk IMX8MQ_CLK_DC_PIXEL>,
+						<&clk IMX8MQ_CLK_DISP_DTRC>;
+			clock-names = "apb", "axi", "rtrm", "pix", "dtrc";
+			assigned-clocks = <&clk IMX8MQ_CLK_DC_PIXEL>,
+						<&clk IMX8MQ_VIDEO_PLL1_BYPASS>,
+						<&clk IMX8MQ_VIDEO_PLL1_REF_SEL>,
+						<&clk IMX8MQ_CLK_DISP_AXI>,
+						<&clk IMX8MQ_CLK_DISP_RTRM>;
+			assigned-clock-parents = <&clk IMX8MQ_VIDEO_PLL1_OUT>,
+						<&clk IMX8MQ_VIDEO_PLL1>,
+						<&clk IMX8MQ_CLK_27M>,
+						<&clk IMX8MQ_SYS1_PLL_800M>,
+						<&clk IMX8MQ_SYS1_PLL_800M>;
+			assigned-clock-rates = <600000000>, <0>, <0>,
+								<800000000>,
+								<400000000>;
+			status = "okay";
+
+			port@0 {
+				dcss_dsi: endpoint {
+					remote-endpoint = <&mipi_dsi_in>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&mipi_dsi>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+			panel@0 {
+				compatible = "ilitek,ili9881c";
+				reg = <0>;
+				vcc-supply = <&reg_mipi_en>;
+				dsi-lanes = <2>;
+
+				port {
+					panel_in: endpoint {
+						remote-endpoint = <&mipi_dsi_out>;
+					};
+				};
+			};
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				port@0 {
+					reg = <0>;
+					mipi_dsi_in: endpoint {
+						remote-endpoint = <&dcss_dsi>;
+					};
+				};
+				port@1 {
+					reg = <1>;
+					mipi_dsi_out: endpoint {
+						remote-endpoint = <&panel_in>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&pwm1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@3 {
+		target = <&backlight>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@4 {
+		target = <&i2c4>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@5 {
+		target = <&ft5426>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};

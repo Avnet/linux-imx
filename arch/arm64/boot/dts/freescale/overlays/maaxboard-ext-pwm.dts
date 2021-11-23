@@ -1,0 +1,61 @@
+/*
+ * Copyright 2021 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "../imx8mq-pinfunc.h"
+
+/* 40-pin extended GPIO, expanded into SPI, I2C, PWM and other interfaces */
+
+/ {
+	compatible = "avnet,maaxboard", "fsl,imx8mq";
+
+	fragment@0 {
+		target = <&iomuxc>;
+		__overlay__ {
+			imx8mq-evk {
+				pinctrl_pwm2: pwm2_grp {
+					fsl,pins = <
+							MX8MQ_IOMUXC_GPIO1_IO13_PWM2_OUT	0x06
+					>;
+				};
+
+				pinctrl_pwm4: pwm4_grp {
+					fsl,pins = <
+							MX8MQ_IOMUXC_GPIO1_IO15_PWM4_OUT	0x06
+					>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&pwm2>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_pwm2>;
+			status = "okay";
+		};
+	};
+
+	fragment@2 {
+		target = <&pwm4>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_pwm4>;
+			status = "okay";
+		};
+	};
+};
