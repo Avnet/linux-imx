@@ -681,7 +681,12 @@
 
 &mipi_dsi {
 	status = "disabled";
+};
 
+&hdmi {
+	compatible = "cdn,imx8mq-hdmi";
+	lane-mapping = <0xe4>;
+	status = "disabled";
 };
 
 &lcdif {

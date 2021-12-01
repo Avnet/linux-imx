@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
- 
+
 /dts-v1/;
 /plugin/;
 
@@ -33,10 +33,7 @@
 	fragment@1 {
 		target = <&hdmi>;
 		__overlay__ {
-			compatible = "cdn,imx8mq-hdmi";
-			lane-mapping = <0xe4>;
 			status = "okay";
-
 			port@1 {
 				hdmi_in: endpoint {
 					remote-endpoint = <&dcss_out>;
