@@ -3,6 +3,7 @@
 # required for overlay support
 DTC_FLAGS += -@
 
+# DTB Overlays for Maaxboard
 dtb-y += maaxboard-mipi.dtbo
 dtb-y += maaxboard-as0260.dtbo
 dtb-y += maaxboard-dual-display.dtbo
@@ -17,8 +18,9 @@ dtb-y += maaxboard-hdmi.dtbo
 dtb-y += maaxboard-ov5640.dtbo
 dtb-y += maaxboard-usb0-device.dtbo
 
-
+# # DTB Overlays for Maaxboard-Nano
 dtb-y += maaxboard-nano-mipi.dtbo
+dtb-y += maaxboard-nano-mipi-oldpanel.dtbo
 dtb-y += maaxboard-nano-audio.dtbo
 dtb-y += maaxboard-nano-mic.dtbo
 dtb-y += maaxboard-nano-ov5640.dtbo
