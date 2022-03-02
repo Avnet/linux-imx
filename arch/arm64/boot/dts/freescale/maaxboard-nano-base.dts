@@ -168,7 +168,7 @@
 			>;
 		};
 
-		pinctrl_ts_ft5426: ft5426_pinsgrp {
+		pinctrl_ts: touchscreen_pinsgrp {
 			fsl,pins = <
 				MX8MN_IOMUXC_GPIO1_IO11_GPIO1_IO11  0x19 /* DSI_TS_nINT */
 				MX8MN_IOMUXC_GPIO1_IO12_GPIO1_IO12   0x19 /* DSI_TS_RST */
@@ -485,7 +485,7 @@
 	ft5426: ft5426_ts@38 {
 		compatible = "focaltech,fts";
 		reg = <0x38>;
-		pinctrl-0 = <&pinctrl_ts_ft5426>;
+		pinctrl-0 = <&pinctrl_ts>;
 
 		interrupt-parent = <&gpio1>;
 		interrupts = <11 2>;
@@ -499,6 +499,20 @@
 		focaltech,keys = <139 102 158>;
 		focaltech,key-y-coord = <2000>;
 		focaltech,key-x-coords = <200 600 800>;
+		status = "disabled";
+	};
+
+	gt911: gt911_ts@14 {
+		compatible = "goodix,gt911";
+		reg = <0x14>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;
+		irq-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
 		status = "disabled";
 	};
 };
