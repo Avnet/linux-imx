@@ -66,6 +66,7 @@
 			panel@0 {
 				compatible = "ilitek,ili9881c";
 				reg = <0>;
+				lcd-model = "sh720128t005";
 				vcc-supply = <&reg_mipi_en>;
 				dsi-lanes = <2>;
 
@@ -121,7 +122,7 @@
 	};
 
 	fragment@5 {
-		target = <&ft5426>;
+		target = <&gt911>;
 		__overlay__ {
 			status = "okay";
 		};
