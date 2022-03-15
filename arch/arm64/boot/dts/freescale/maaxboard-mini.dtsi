@@ -257,7 +257,7 @@
 			>;
 		};
 
-		pinctrl_ts_ft5426: ft5426_pinsgrp {
+		pinctrl_ts: touchscreen_pinsgrp {
 			fsl,pins = <
 				MX8MM_IOMUXC_SAI5_RXFS_GPIO3_IO19  0x19 /* DSI_TS_nINT */
 				MX8MM_IOMUXC_SAI5_RXC_GPIO3_IO20   0x19 /* DSI_TS_RST */
@@ -539,25 +539,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c4>;
 	status = "okay";
-
-	ft5426_ts@38 {
-			compatible = "focaltech,fts";
-			reg = <0x38>;
-			pinctrl-0 = <&pinctrl_ts_ft5426>;
-
-			interrupt-parent = <&gpio3>;
-			interrupts = <19 2>;
-			focaltech,reset-gpio = <&gpio3 20 0x01>;
-			focaltech,irq-gpio = <&gpio3 19 0x02>;
-			focaltech,max-touch-number = <10>;
-			focaltech,panel-type = <0x54260002>;/* _FT5426 */
-			focaltech,display-coords =  <0 0 720 1280>;
-			focaltech,have-key;
-			focaltech,key-number = <3>;
-			focaltech,keys = <139 102 158>;
-			focaltech,key-y-coord = <2000>;
-			focaltech,key-x-coords = <200 600 800>;
-	};
 };
 
 &usbotg1 {
