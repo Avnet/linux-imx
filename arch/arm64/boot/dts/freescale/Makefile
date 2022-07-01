@@ -236,4 +236,5 @@ dtb-$(CONFIG_ARCH_S32) += s32v234-evb.dtb \
 			  s32v234-sbc.dtb
 
 DTC_FLAGS_maaxboard-8ulp := -@
+subdir-$(CONFIG_ARCH_MXC) += overlays
 dtb-$(CONFIG_ARCH_MXC) += maaxboard-8ulp.dtb

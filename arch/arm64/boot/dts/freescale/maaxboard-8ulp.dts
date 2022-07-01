@@ -193,7 +193,7 @@
 &i2c_rpbus_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "okay";
+	status = "disabled";
 
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640";
@@ -201,7 +201,7 @@
 		clocks = <&cgc2 IMX8ULP_CLK_DSI_PHY_REF>;
 		clock-names = "xclk";
 		/*reset-gpios = <&rpmsg_gpioc 23 GPIO_ACTIVE_HIGH>;*/
-		status = "okay";
+		status = "disabled";
 		port {
 			ov5640_mipi_ep: endpoint {
 				remote-endpoint = <&mipi_csi0_ep>;
@@ -213,14 +213,14 @@
 };
 
 &cameradev {
-	status = "okay";
+	status = "disabled";
 };
 
 &isi_0 {
-	status = "okay";
+	status = "disabled";
 
 	cap_device {
-		status = "okay";
+		status = "disabled";
 	};
 };
 
@@ -228,7 +228,7 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 
-	status = "okay";
+	status = "disabled";
 	port@0 {
 		reg = <0>;
 		mipi_csi0_ep: endpoint {
@@ -240,7 +240,7 @@
 };
 
 &epxp {
-	status = "okay";
+	status = "disabled";
 };
 
 /*+---------------------+
@@ -248,15 +248,15 @@
   +---------------------+*/
 
 &dcnano {
-	status = "okay";
+	status = "disabled";
 };
 
 &dphy {
-	status = "okay";
+	status = "disabled";
 };
 
 &dsi {
-	status = "okay";
+	status = "disabled";
 	panel@0 {
 		compatible = "ilitek,ili9881c";
 		reg = <0>;
@@ -286,7 +286,7 @@
 &i2c_rpbus_0 {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "okay";
+	status = "disabled";
 
 	gt911: gt911_ts@14 {
 		compatible = "goodix,gt911";
@@ -298,7 +298,7 @@
 		touchscreen-size-x = <720>;
 		touchscreen-size-y = <1280>;
 		edge-failling-trigger;
-		status = "okay";
+		status = "disabled";
 	};
 };
 
