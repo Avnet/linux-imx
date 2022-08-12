@@ -173,6 +173,13 @@
 
 		status = "okay";
 	};
+
+	pwm_backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&tpm_rpchip_3 5 50000 0>;
+		brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <8>;
+	};
 };
 
 &lpuart5 {
@@ -299,6 +306,7 @@
 		vcc-supply = <&reg_5v>;
 		iovcc-supply = <&reg_5v>;
 		lcd-model = "sh720128t005";
+		backlight = <&pwm_backlight>;
 
 		port {
 			panel_in: endpoint {

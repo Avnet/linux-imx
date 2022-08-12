@@ -22,6 +22,7 @@ struct ili9881c_panel {
 
 	struct regulator	*vcc_en;
 	struct gpio_desc	*reset_gpio;
+	struct backlight_device *backlight;
 	const struct ili9881c_instr *init_code;
 	unsigned int init_code_len;
 };
@@ -204,7 +205,7 @@ static const struct ili9881c_instr ili9881c_init_ph720128t003[] = {
 	ILI9881C_COMMAND_INSTR(0xB5, 0xD7),
 	ILI9881C_COMMAND_INSTR(0x35, 0x1f),
 	ILI9881C_SWITCH_PAGE_INSTR(1),
-	ILI9881C_COMMAND_INSTR(0x22, 0x09),
+	ILI9881C_COMMAND_INSTR(0x22, 0x0A),
 	ILI9881C_COMMAND_INSTR(0x53, 0x72),
 	ILI9881C_COMMAND_INSTR(0x55, 0x77),
 	ILI9881C_COMMAND_INSTR(0x50, 0xa6),
@@ -603,6 +604,12 @@ static int ili9881c_enable(struct drm_panel *panel)
 		return ret;
 	}
 
+	ret = backlight_enable(tftcp->backlight);
+	if (ret) {
+		dev_err(&tftcp->dsi->dev, "Failed to enable backlight %d\n", ret);
+		return ret;
+	}
+
 	dev_dbg(&tftcp->dsi->dev,"%s\n",__func__);
 	return 0;
 }
@@ -628,6 +635,7 @@ static int ili9881c_disable(struct drm_panel *panel)
 		return ret;
 	}
 
+	backlight_disable(tftcp->backlight);
 	return 0;
 }
 
@@ -809,6 +817,10 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 			tftcp->init_code_len = ARRAY_SIZE(ili9881c_init_ph720128t003);
 			dev_dbg(&dsi->dev, "lcd PH720128T003-ZBC02\n");
 	}
+
+	tftcp->backlight = devm_of_find_backlight(&dsi->dev);
+	if (IS_ERR(tftcp->backlight))
+		return PTR_ERR(tftcp->backlight);
 
 	drm_panel_init(&tftcp->panel, &dsi->dev, &ili9881c_funcs,
 		       DRM_MODE_CONNECTOR_DSI);

@@ -10,6 +10,7 @@
 		gpio2 = &rpmsg_gpioc;
 		i2c0 = &i2c_rpbus_0;
 		i2c1 = &i2c_rpbus_1;
+		pwm3 = &tpm_rpchip_3;
 		pwm0 = &tpm_rpchip_0;
 	};
 
@@ -81,4 +82,12 @@
 		fsl,pwm-channel-number = <6>;
 		status = "disabled";
 	};
+
+	tpm_rpchip_3: pwm {
+		compatible = "fsl,pwm-rpchip";
+		#pwm-cells = <3>;
+		fsl,pwm-channel-number = <6>;
+		status = "okay";
+	};
+
 };
