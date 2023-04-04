@@ -239,5 +239,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-9x9-qsb.dtb \
 dtb-$(CONFIG_ARCH_S32) += s32v234-evb.dtb \
 			  s32v234-sbc.dtb
 
-# MaaXBoard Support
+# MaaXBoard overlay support
+DTC_FLAGS_maaxboard := -@
 dtb-$(CONFIG_ARCH_MXC) += maaxboard.dtb
+subdir-$(CONFIG_ARCH_MXC) += maaxboard
