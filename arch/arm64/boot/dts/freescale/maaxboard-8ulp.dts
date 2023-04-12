@@ -205,12 +205,7 @@
 };
 
 &usbotg1 { /* TypeC for power support on MaaXBoard-8ULP */
-	pinctrl-names = "default", "sleep";
-	dr_mode = "host";
-	hnp-disable;
-	srp-disable;
-	adp-disable;
-	over-current-active-low;
+	dr_mode = "peripheral";
 	status = "okay";
 };
 
@@ -223,12 +218,7 @@
 };
 
 &usbotg2 { /* Connect to USB HUB for 4*port on MaaXBoard-8ULP */
-	pinctrl-names = "default", "sleep";
 	dr_mode = "host";
-	hnp-disable;
-	srp-disable;
-	adp-disable;
-	over-current-active-low;
 	status = "okay";
 };
 
