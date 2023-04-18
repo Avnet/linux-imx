@@ -21,6 +21,13 @@
 		#clock-cells = <0>;
 	};
 
+	da7212_mclk: da7212-mclk {
+		compatible = "fixed-clock";
+		clock-frequency = <12288000>;
+		clock-output-names = "da7212_mclk";
+		#clock-cells = <0>;
+	};
+
 	imx8ulp_cm33: imx8ulp-cm33 {
 		compatible = "fsl,imx8ulp-cm33", "fsl,imx7ulp-cm4";
 		status = "disabled";
