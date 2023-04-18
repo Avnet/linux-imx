@@ -918,8 +918,9 @@ static void ili9881c_get_devid(struct ili9881c *ctx)
 	ctx->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 	ili9881c_switch_page(ctx, 1);
 	id[0] = ili9881c_read_cmd_data(ctx, 0x00);
+	id[1] = ili9881c_read_cmd_data(ctx, 0x01);
+	id[2] = ili9881c_read_cmd_data(ctx, 0x02);
 
-	id[1] = ili9881c_read_cmd_data(ctx, 0x01); id[2] = ili9881c_read_cmd_data(ctx, 0x02);
 	dev_info(&ctx->dsi->dev, "Panel ID: 0x%02X 0x%02X 0x%02X \n", id[0], id[1], id[2]);
 }
 
@@ -1034,7 +1035,7 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 }
 
 static const struct drm_display_mode ph720128t003_default_mode = {
-	.clock		= 67000,
+	.clock		= 66000,
 
 	.hdisplay	= 720,
 	.hsync_start= 720 + 120,
@@ -1051,7 +1052,7 @@ static const struct drm_display_mode ph720128t003_default_mode = {
 };
 
 static const struct drm_display_mode ph720128t005_default_mode = {
-	.clock		= 67000,
+	.clock		= 66000,
 
 	.hdisplay	= 720,
 	.hsync_start= 720 + 120,

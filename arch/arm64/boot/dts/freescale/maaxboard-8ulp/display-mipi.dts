@@ -1,0 +1,48 @@
+/*
+ * Copyright 2022 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+/* Device tree overlay for MIPI LCD and touchscreen */
+
+&dcnano {
+	status = "okay";
+};
+
+&dphy {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	panel@0 {
+		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+	};
+};
+
+&i2c_rpbus_0 {
+	status = "okay";
+
+	/* touch screen for avnet,ph720128t005 */
+	gt911: gt911_ts@14 {
+		status = "okay";
+	};
+
+	/* touch screen for avnet,ph720128t003 panel */
+	ft5426: ft5426_ts@38 {
+		status = "disabled";
+	};
+};
