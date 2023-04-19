@@ -20,17 +20,17 @@
 /* 40-pin extended GPIO, expanded into lpi2c4 */
 
 &lpi2c4 {
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&pinctrl_exti2c4>;
 	status = "okay";
 };
 
 &iomuxc1 {
+	pinctrl-0 = <&pinctrl_extgpio &pinctrl_exti2c4 &pinctrl_extspi5 &pinctrl_extuart4>;
+
 	pinctrl_exti2c4: exti2c4_grp {
-		fsl,pins = < 
+		fsl,pins = <
 			MX8ULP_PAD_PTF8__LPI2C4_SCL		0x20
 			MX8ULP_PAD_PTF9__LPI2C4_SDA		0x20
 		>;
-	};	
+	};
 };
 

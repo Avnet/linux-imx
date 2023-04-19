@@ -22,8 +22,6 @@
 
 &lpspi5 {
 	fsl,spi-num-chipselects = <1>;
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&pinctrl_extspi5>;
 	cs-gpios = <&gpiof 19 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
@@ -38,8 +36,10 @@
 };
 
 &iomuxc1 {
+	pinctrl-0 = <&pinctrl_extgpio &pinctrl_exti2c4 &pinctrl_extspi5 &pinctrl_extuart4>;
+
 	pinctrl_extspi5: extspi5_grp {
-		fsl,pins = < 
+		fsl,pins = <
 			MX8ULP_PAD_PTF16__LPSPI5_SIN	0x3
 			MX8ULP_PAD_PTF17__LPSPI5_SOUT	0x3
 			MX8ULP_PAD_PTF18__LPSPI5_SCK	0x3

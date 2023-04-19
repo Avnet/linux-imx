@@ -20,13 +20,11 @@
 /* 40-pin extended GPIO, expanded into lpuart4 */
 
 &lpuart4 {
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&pinctrl_extuart4>;
-	pinctrl-1 = <&pinctrl_extuart4>;
 	status = "okay";
 };
 
 &iomuxc1 {
+	pinctrl-0 = <&pinctrl_extgpio &pinctrl_exti2c4 &pinctrl_extspi5 &pinctrl_extuart4>;
 	pinctrl_extuart4: extuart4_grp {
 		fsl,pins = <
 			MX8ULP_PAD_PTF10__LPUART4_TX	0x3
