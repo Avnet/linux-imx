@@ -241,9 +241,14 @@ dtb-$(CONFIG_ARCH_S32) += s32v234-evb.dtb \
 
 # MaaXBoard overlay support
 DTC_FLAGS_maaxboard := -@
+DTC_FLAGS_maaxboard-mini := -@
 DTC_FLAGS_maaxboard-8ulp := -@
-dtb-$(CONFIG_ARCH_MXC) += maaxboard.dtb \
+
+dtb-$(CONFIG_ARCH_MXC) += \
+			  maaxboard.dtb \
+			  maaxboard-mini.dtb \
 			  maaxboard-8ulp.dtb
 
-subdir-$(CONFIG_ARCH_MXC) += maaxboard \
+subdir-$(CONFIG_ARCH_MXC) += \
+			  maaxboard \
 			  maaxboard-8ulp
