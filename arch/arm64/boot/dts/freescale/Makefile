@@ -251,4 +251,5 @@ dtb-$(CONFIG_ARCH_MXC) += \
 
 subdir-$(CONFIG_ARCH_MXC) += \
 			  maaxboard \
+			  maaxboard-mini \
 			  maaxboard-8ulp
