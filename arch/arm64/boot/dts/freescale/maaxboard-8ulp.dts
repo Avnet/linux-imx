@@ -101,17 +101,6 @@
 		};
 	};
 
-	reg_mipi_en: regulator-mipi-vcc {
-		compatible = "regulator-fixed";
-		regulator-name = "MIPI_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-always-on;
-		enable-active-high;
-		startup-delay-us = <160000>;
-		gpio = <&rpmsg_gpioa 6 GPIO_ACTIVE_HIGH>;
-	};
-
 	wlan_pwrseq: wlan_pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		pinctrl-names = "default";
@@ -160,11 +149,13 @@
 		};
 	};
 
-	pwm_backlight: backlight {
+	backlight: pwm-backlight {
 		compatible = "pwm-backlight";
 		pwms = <&tpm_rpchip_3 5 50000 0>;
 		brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
 		default-brightness-level = <8>;
+		enable-pwm-on;
+		status = "disabled";
 	};
 
 	rpmsg_audio: rpmsg-audio {
@@ -306,29 +297,6 @@
 
 &dsi {
 	status = "disabled";
-	panel@0 {
-		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
-		reg = <0>;
-		dsi-lanes = <2>;
-		power-supply = <&reg_mipi_en>;
-		backlight = <&pwm_backlight>;
-
-		port {
-			panel_in: endpoint {
-				remote-endpoint = <&mipi_dsi_out>;
-			};
-		};
-	};
-
-	ports {
-		port@1 {
-			reg = <1>;
-
-			mipi_dsi_out: endpoint {
-				remote-endpoint = <&panel_in>;
-			};
-		};
-	};
 };
 
 &i2c_rpbus_0 {

@@ -15,6 +15,8 @@
 /dts-v1/;
 /plugin/;
 
+#include <dt-bindings/gpio/gpio.h>
+
 /* Device tree overlay for MIPI LCD and touchscreen */
 
 &dcnano {
@@ -27,22 +29,51 @@
 
 &dsi {
 	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	panel@0 {
 		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
 		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		reg = <0>;
+		dsi-lanes = <2>;
+		pwn-gpios = <&rpmsg_gpioa 6 GPIO_ACTIVE_HIGH>;
+		backlight = <&backlight>;
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mipi_dsi_out>;
+			};
+		};
 	};
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@1 {
+			reg = <1>;
+
+			mipi_dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&backlight{
+	status = "okay";
 };
 
 &i2c_rpbus_0 {
 	status = "okay";
+};
 
-	/* touch screen for avnet,ph720128t005 */
-	gt911: gt911_ts@14 {
-		status = "okay";
-	};
+/* For Avnet PH720128T005 LCD display */
+&gt911{
+	status = "okay";
+};
 
-	/* touch screen for avnet,ph720128t003 panel */
-	ft5426: ft5426_ts@38 {
-		status = "disabled";
-	};
+/* For Avnet PH720128T003 LCD display */
+&ft5426{
+	status = "disabled";
 };

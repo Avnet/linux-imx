@@ -50,7 +50,7 @@ struct ili9881c {
 	struct mipi_dsi_device	*dsi;
 	const struct ili9881c_desc	*desc;
 
-	struct regulator	*power;
+	struct gpio_desc	*power;
 	struct gpio_desc	*reset;
 };
 
@@ -927,15 +927,8 @@ static void ili9881c_get_devid(struct ili9881c *ctx)
 static int ili9881c_prepare(struct drm_panel *panel)
 {
 	struct ili9881c *ctx = panel_to_ili9881c(panel);
-	int ret;
 
-	/* Power the panel */
-	ret = regulator_enable(ctx->power);
-	if (ret)
-		return ret;
-	msleep(5);
-
-	/* And reset it */
+	/* HW reset it */
 	if( ctx->reset )
 	{
 		gpiod_set_value(ctx->reset, 1);
@@ -953,6 +946,7 @@ static int ili9881c_enable(struct drm_panel *panel)
 	struct ili9881c *ctx = panel_to_ili9881c(panel);
 	unsigned int i;
 	int ret;
+	static int first=1;
 
 	ctx->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
@@ -991,7 +985,11 @@ static int ili9881c_enable(struct drm_panel *panel)
 		return ret;
 	}
 
-	ili9881c_get_devid(ctx);
+	if( first )
+	{
+		ili9881c_get_devid(ctx);
+		first=0;
+	}
 
 	return 0;
 }
@@ -1011,11 +1009,13 @@ static int ili9881c_disable(struct drm_panel *panel)
 
 	usleep_range(100000, 110000);
 
+#if 0 /* Can not enter sleep mode because MaaXBoard can not wake up again */
 	ret = mipi_dsi_dcs_enter_sleep_mode(ctx->dsi);
 	if (ret < 0) {
 		dev_err(&ctx->dsi->dev, "Failed to enter sleep mode (%d)\n", ret);
 		return ret;
 	}
+#endif
 
 	backlight_disable(ctx->panel.backlight);
 
@@ -1026,8 +1026,6 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 {
 	struct ili9881c *ctx = panel_to_ili9881c(panel);
 
-	mipi_dsi_dcs_enter_sleep_mode(ctx->dsi);
-	regulator_disable(ctx->power);
 	if( ctx->reset )
 		gpiod_set_value(ctx->reset, 1);
 
@@ -1153,10 +1151,16 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 	drm_panel_init(&ctx->panel, &dsi->dev, &ili9881c_funcs,
 		       DRM_MODE_CONNECTOR_DSI);
 
-	ctx->power = devm_regulator_get(&dsi->dev, "power");
+	ctx->power = devm_gpiod_get(&dsi->dev, "pwn", GPIOD_OUT_LOW);
 	if (IS_ERR(ctx->power)) {
-		dev_err(&dsi->dev, "Couldn't get our power regulator\n");
+		dev_err(&dsi->dev, "Couldn't get our power gpio");
 		return PTR_ERR(ctx->power);
+	}
+	else {
+		gpiod_set_value_cansleep(ctx->power, 0);
+		msleep(50);
+		gpiod_set_value_cansleep(ctx->power, 1);
+		msleep(400);
 	}
 
 	ctx->reset = devm_gpiod_get_optional(&dsi->dev, "reset", GPIOD_OUT_LOW);
@@ -1202,6 +1206,10 @@ static void ili9881c_dsi_shutdown(struct mipi_dsi_device *dsi)
 
 	ili9881c_disable(&ctx->panel);
 	ili9881c_unprepare(&ctx->panel);
+
+	if (ctx->power) {
+		gpiod_set_value_cansleep(ctx->power, 0);
+	}
 }
 
 static const struct ili9881c_desc ph720128t003_desc = {

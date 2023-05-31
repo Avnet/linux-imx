@@ -23,24 +23,6 @@
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};
 
-	regulators {
-		compatible = "simple-bus";
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		reg_mipi_en: regulator-mipi-vcc {
-			compatible = "regulator-fixed";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_mipi_dsi_en>;
-			regulator-name = "mipi_vcc_en";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			enable-active-high;
-			startup-delay-us = <160000>;
-			gpio = <&gpio1 9 GPIO_ACTIVE_HIGH>;
-		};
-	};
-
 	/* WiFi & Bluetooth */
 	wlan_pwrseq: sdio-pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -445,12 +427,6 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_I2C1_SCL_I2C1_SCL				0x400001c3
 			MX8MM_IOMUXC_I2C1_SDA_I2C1_SDA				0x400001c3
-		>;
-	};
-
-	pinctrl_mipi_dsi_en: mipi_dsi_en {
-		fsl,pins = <
-			MX8MM_IOMUXC_GPIO1_IO09_GPIO1_IO9			0x16  /* DSI_EN */
 		>;
 	};
 

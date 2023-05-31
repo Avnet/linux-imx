@@ -16,6 +16,7 @@
 /plugin/;
 
 #include <dt-bindings/clock/imx8mq-clock.h>
+#include <dt-bindings/gpio/gpio.h>
 #include "../imx8mq-pinfunc.h"
 
 /* Device tree overlay for MIPI LCD and touchscreen */
@@ -59,10 +60,12 @@
 	#size-cells = <0>;
 
 	panel@0 {
-		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
 		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
 		reg = <0>;
-		power-supply=<&reg_mipi_en>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		pwn-gpios = <&gpio3 12 GPIO_ACTIVE_HIGH>;
 		dsi-lanes = <2>;
 		backlight = <&backlight>;
 
@@ -108,12 +111,20 @@
 	status = "okay";
 };
 
+/* For Avnet PH720128T005 LCD display */
+&gt911{
+	status = "okay";
+};
+
 /* For Avnet PH720128T003 LCD display */
 &ft5426{
 	status = "disabled";
 };
 
-/* For Avnet PH720128T005 LCD display */
-&gt911{
-	status = "okay";
+&iomuxc {
+	pinctrl_mipi_dsi_en: mipi_dsi_en {
+		fsl,pins = <
+			MX8MQ_IOMUXC_NAND_DATA06_GPIO3_IO12			0x16  /* DSI_EN */
+		>;
+	};
 };

@@ -76,18 +76,6 @@
 			regulator-always-on;
 			enable-active-high;
 		};
-
-		reg_mipi_en: regulator-mipi-vcc {
-			compatible = "regulator-fixed";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_mipi_dsi_en>;
-			regulator-name = "mipi_vcc_en";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			enable-active-high;
-			startup-delay-us = <160000>;
-			gpio = <&gpio3 12 GPIO_ACTIVE_HIGH>;
-		};
 	};
 
 	wlan_pwrseq: sdio-pwrseq {
@@ -730,12 +718,6 @@
 	pinctrl_usb1_pwr_en: usb1_pwr_en {
 		fsl,pins = <
 			MX8MQ_IOMUXC_GPIO1_IO12_GPIO1_IO12		0x16  /* USB1_EN */
-		>;
-	};
-
-	pinctrl_mipi_dsi_en: mipi_dsi_en {
-		fsl,pins = <
-			MX8MQ_IOMUXC_NAND_DATA06_GPIO3_IO12		0x16  /* DSI_EN */
 		>;
 	};
 
