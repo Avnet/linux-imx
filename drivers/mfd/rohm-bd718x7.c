@@ -213,7 +213,7 @@ static int bd718xx_i2c_probe(struct i2c_client *i2c,
 
 	button.irq = ret;
 
-#if 0 /* kernel will stuck at here  */
+#ifndef CONFIG_MFD_ROHM_BD718X7_REBOOT /*  kernel will stuck at here on MaaXBoard-Mini */
 	ret = devm_mfd_add_devices(&i2c->dev, PLATFORM_DEVID_AUTO,
 				   mfd, cells, NULL, 0,
 				   regmap_irq_get_domain(irq_data));
