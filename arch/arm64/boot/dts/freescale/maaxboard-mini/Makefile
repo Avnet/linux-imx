@@ -12,7 +12,6 @@ dtb-y += ext-i2c3.dtbo
 dtb-y += ext-pwm1.dtbo
 dtb-y += ext-pwm2.dtbo
 dtb-y += ext-pwm3.dtbo
-dtb-y += ext-pwm4.dtbo
 dtb-y += ext-spi1.dtbo
 dtb-y += ext-uart2.dtbo
 dtb-y += ext-wm8960.dtbo
