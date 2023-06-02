@@ -260,6 +260,29 @@
 	};
 };
 
+/* MIPI-CSI2 Camera */
+&csi1_bridge {
+	fsl,mipi-mode;
+	status = "disabled";
+
+	port {
+		csi1_ep: endpoint {
+			remote-endpoint = <&csi1_mipi_ep>;
+		};
+	};
+};
+
+&mipi_csi_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "disabled";
+	port {
+		csi1_mipi_ep: endpoint@2 {
+			remote-endpoint = <&csi1_ep>;
+		};
+	};
+};
+
 /* Press this key for 8 seconds will shutdown */
 &snvs_pwrkey {
 	status = "okay";
@@ -427,6 +450,13 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_I2C1_SCL_I2C1_SCL				0x400001c3
 			MX8MM_IOMUXC_I2C1_SDA_I2C1_SDA				0x400001c3
+		>;
+	};
+
+	pinctrl_csi1: csi1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI5_RXD1_GPIO3_IO22			0x19
+			MX8MM_IOMUXC_SAI5_RXD0_GPIO3_IO21			0x19
 		>;
 	};
 
