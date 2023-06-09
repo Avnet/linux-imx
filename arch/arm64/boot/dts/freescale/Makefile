@@ -276,4 +276,10 @@ dtb-$(CONFIG_ARCH_S32) += s32v234-evb.dtb \
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-sof-cs42888.dtb imx8qm-mek-sof-wm8960.dtb imx8qm-mek-sof.dtb
 
 # MaaXBoard support
-dtb-$(CONFIG_ARCH_MXC) += maaxboard-8ulp.dtb
+DTC_FLAGS_maaxboard-8ulp := -@
+
+dtb-$(CONFIG_ARCH_MXC) += \
+	maaxboard-8ulp.dtb
+
+subdir-$(CONFIG_ARCH_MXC) += \
+	maaxboard-8ulp
