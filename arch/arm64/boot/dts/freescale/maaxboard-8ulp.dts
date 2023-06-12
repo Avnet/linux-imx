@@ -287,6 +287,63 @@
 	};
 };
 
+/*+-------------------------+
+  | MIPI-CSI2 Camera Module |
+  +-------------------------+*/
+
+&i2c_rpbus_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	ov5640_mipi: ov5640_mipi@3c {
+		compatible = "ovti,ov5640";
+		reg = <0x3c>;
+		clocks = <&cgc2 IMX8ULP_CLK_DSI_PHY_REF>;
+		clock-names = "xclk";
+		reset-gpios = <&rpmsg_gpioc 23 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+		port {
+			ov5640_mipi_ep: endpoint {
+				remote-endpoint = <&mipi_csi0_ep>;
+				data-lanes = <1 2>;
+				clocks-lanes = <0>;
+			};
+		};
+	};
+};
+
+&cameradev {
+	status = "disabled";
+};
+
+&isi_0 {
+	status = "disabled";
+
+	cap_device {
+		status = "disabled";
+	};
+};
+
+&mipi_csi0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "disabled";
+	port@0 {
+		reg = <0>;
+		mipi_csi0_ep: endpoint {
+			remote-endpoint = <&ov5640_mipi_ep>;
+			data-lanes = <1 2>;
+			bus-type = <4>;
+		};
+	};
+};
+
+&epxp {
+	status = "disabled";
+};
+
 /*+------------------+
   | Ethernet Modules |
   +------------------+*/
