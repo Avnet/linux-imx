@@ -186,6 +186,23 @@
 		enable-pwm-on;
 		status = "disabled";
 	};
+
+	rpmsg_audio: rpmsg-audio {
+		compatible = "fsl,imx8ulp-rpmsg-audio";
+		model = "da7212-audio";
+		fsl,rpmsg-out;
+		fsl,rpmsg-in;
+		audio-codec = <&da7212>;
+		memory-region = <&audio_reserved>;
+
+		audio-routing =
+			"MIC1", "Mic Jack",
+			"Mic Jack", "Mic Bias 1",
+			"Headphone Jack", "HPL",
+			"Headphone Jack", "HPR";
+
+		status = "okay";
+	};
 };
 
 &lpuart5 {
@@ -310,6 +327,16 @@
 				clocks-lanes = <0>;
 			};
 		};
+	};
+
+	da7212: codec@1a {
+		compatible = "dlg,da7212";
+		#sound-dai-cells = <0>;
+		reg = <0x1a>;
+		dlg,micbias1-lvl = <2500>;
+		dlg,micbias2-lvl = <2500>;
+		clocks = <&da7212_mclk>;
+		clock-names = "mclk";
 	};
 };
 
