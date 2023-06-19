@@ -1,0 +1,130 @@
+/*
+ * Copyright 2023 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mq-clock.h>
+#include <dt-bindings/gpio/gpio.h>
+#include "../imx8mq-pinfunc.h"
+
+/* Device tree overlay for MIPI LCD and touchscreen */
+
+&dcss{
+	status = "okay";
+	clocks = <&clk IMX8MQ_CLK_DISP_APB_ROOT>,
+		   <&clk IMX8MQ_CLK_DISP_AXI_ROOT>,
+		   <&clk IMX8MQ_CLK_DISP_RTRM_ROOT>,
+		   <&clk IMX8MQ_CLK_DC_PIXEL>,
+		   <&clk IMX8MQ_CLK_DISP_DTRC>;
+	clock-names = "apb", "axi", "rtrm", "pix", "dtrc";
+	assigned-clocks = <&clk IMX8MQ_CLK_DC_PIXEL>,
+		<&clk IMX8MQ_VIDEO_PLL1_BYPASS>,
+		<&clk IMX8MQ_VIDEO_PLL1_REF_SEL>,
+		<&clk IMX8MQ_CLK_DISP_AXI>,
+		<&clk IMX8MQ_CLK_DISP_APB>,
+		<&clk IMX8MQ_CLK_DISP_RTRM>;
+	assigned-clock-parents = <&clk IMX8MQ_VIDEO_PLL1_OUT>,
+		<&clk IMX8MQ_VIDEO_PLL1>,
+		<&clk IMX8MQ_CLK_27M>,
+		<&clk IMX8MQ_SYS1_PLL_800M>,
+		<&clk IMX8MQ_SYS1_PLL_800M>,
+		<&clk IMX8MQ_SYS1_PLL_800M>;
+	assigned-clock-rates = <600000000>, <0>, <0>,
+		<800000000>,
+		<25000000>,
+		<400000000>;
+
+	port@0 {
+		dcss_out: endpoint {
+			remote-endpoint = <&mipi_dsi_in>;
+		};
+	};
+};
+
+&mipi_dsi{
+	status = "okay";
+	fsl,clock-drop-level = <2>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel@0 {
+		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		pwn-gpios = <&gpio3 12 GPIO_ACTIVE_HIGH>;
+		dsi-lanes = <2>;
+		backlight = <&backlight>;
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mipi_dsi_out>;
+			};
+		};
+	};
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+			mipi_dsi_in: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&dcss_out>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			mipi_dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&pwm1{
+	status = "okay";
+};
+
+&backlight{
+	status = "okay";
+};
+
+&i2c4{
+	status = "okay";
+};
+
+/* For Avnet PH720128T005 LCD display */
+&gt911{
+	status = "okay";
+};
+
+/* For Avnet PH720128T003 LCD display */
+&ft5426{
+	status = "disabled";
+};
+
+&iomuxc {
+	pinctrl_mipi_dsi_en: mipi_dsi_en {
+		fsl,pins = <
+			MX8MQ_IOMUXC_NAND_DATA06_GPIO3_IO12			0x16  /* DSI_EN */
+		>;
+	};
+};
