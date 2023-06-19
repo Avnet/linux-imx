@@ -1,0 +1,134 @@
+/*
+ * Copyright 2023 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "../imx8mq-pinfunc.h"
+
+/* Device tree overlay for both HDMI and MIPI LCD display */
+
+/* HDMI connect to DCSS */
+&dcss{
+	status = "okay";
+	port@0 {
+		dcss_out: endpoint {
+			remote-endpoint = <&hdmi_in>;
+		};
+	};
+};
+
+&hdmi{
+	status = "okay";
+	port@1 {
+		hdmi_in: endpoint {
+			remote-endpoint = <&dcss_out>;
+		};
+	};
+};
+
+&sai4{
+	status = "okay";
+};
+
+&hdmi_audio{
+	status = "okay";
+};
+
+/* MIPI LCD connect to LCDIF */
+
+&mipi_dsi{
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	panel@0 {
+		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		pwn-gpios = <&gpio3 12 GPIO_ACTIVE_HIGH>;
+		dsi-lanes = <2>;
+		backlight = <&backlight>;
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mipi_dsi_out>;
+			};
+		};
+	};
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+			mipi_dsi_in: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&lcdif_dsi>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			mipi_dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&lcdif {
+	status = "okay";
+	port@0 {
+		lcdif_dsi: endpoint {
+			remote-endpoint = <&mipi_dsi_in>;
+		};
+	};
+};
+
+&pwm1{
+	status = "okay";
+};
+
+&backlight{
+	status = "okay";
+};
+
+&i2c4{
+	status = "okay";
+};
+
+/* For Avnet PH720128T005 LCD display */
+&gt911{
+	status = "okay";
+};
+
+/* For Avnet PH720128T003 LCD display */
+&ft5426{
+	status = "disabled";
+};
+
+&iomuxc {
+	pinctrl_mipi_dsi_en: mipi_dsi_en {
+		fsl,pins = <
+			MX8MQ_IOMUXC_NAND_DATA06_GPIO3_IO12			0x16  /* DSI_EN */
+		>;
+	};
+};

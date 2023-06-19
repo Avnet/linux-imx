@@ -4,6 +4,7 @@
 DTC_FLAGS += -@
 
 # DTB Overlays for Maaxboard
+dtb-y += display-dual.dtbo
 dtb-y += display-hdmi.dtbo
 dtb-y += display-mipi.dtbo
 dtb-y += ext-gpio.dtbo
