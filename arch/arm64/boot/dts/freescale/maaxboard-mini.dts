@@ -23,6 +23,22 @@
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};
 
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_usb1_power: regulator-usb-3v3 {
+			compatible = "regulator-fixed";
+			regulator-name = "usb1-power-en";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+			off-on-delay = <1000>;
+			startup-delay-us = <300>;
+		};
+	};
+
 	/* WiFi & Bluetooth */
 	wlan_pwrseq: sdio-pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -426,6 +442,12 @@
 };
 
 &iomuxc {
+	pinctrl_usb_pwren: usb_pwrengrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12			0x02
+		>;
+	};
+
 	pinctrl_gpio_leds: gpio_ledsgrp {
 		fsl,pins = <
 			MX8MM_IOMUXC_NAND_CE1_B_GPIO3_IO2			0x19
