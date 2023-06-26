@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 /*
- * Copyright 2023 Avnet
+ * Device Tree Source for the Avnet MaaXBoard (i.MX8M Quad: 4xCortex-A53 + Cortex-M4)
+ *
+ * Copyright (C) 2023 Avnet Corp.
  */
 
 /dts-v1/;
