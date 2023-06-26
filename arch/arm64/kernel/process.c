@@ -125,6 +125,12 @@ void machine_power_off(void)
  */
 void machine_restart(char *cmd)
 {
+#ifdef CONFIG_MFD_ROHM_BD718X7_REBOOT
+	/* don't use do_kernel_restart() because it will print noisy message. */
+	extern void pmic_bd718x7_reboot(void);
+	pmic_bd718x7_reboot();
+#endif
+
 	/* Disable interrupts first */
 	local_irq_disable();
 	smp_send_stop();
