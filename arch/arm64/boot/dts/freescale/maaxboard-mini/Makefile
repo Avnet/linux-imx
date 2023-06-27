@@ -4,6 +4,7 @@
 DTC_FLAGS += -@
 
 # DTB Overlays for Maaxboard-Mini
+dtb-y += camera-ov5640.dtbo
 dtb-y += display-mipi.dtbo
 dtb-y += ext-gpio.dtbo
 dtb-y += ext-i2c2.dtbo
