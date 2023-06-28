@@ -1,0 +1,117 @@
+/*
+ * Copyright 2023 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mm-clock.h>
+#include "../imx8mm-pinfunc.h"
+
+/* 40-pin extended GPIO, expanded into wm8960 on I2C2/SAI3 */
+
+&i2c2{
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	wm8960: wm8960@1a {
+		#sound-dai-cells = <0>;
+		compatible = "wlf,wm8960";
+		reg = <0x1a>;
+		clocks = <&wm8960_osc>;
+		clock-names = "mclk";
+		wlf,shared-lrclk;
+	};
+};
+
+&sai3{
+	pinctrl-names = "default";
+	#sound-dai-cells = <0>;
+	pinctrl-0 = <&pinctrl_sai3>;
+	assigned-clocks = <&clk IMX8MM_CLK_SAI3>;
+	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
+	assigned-clock-rates = <24576000>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_i2c2: i2c2grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C2_SCL_I2C2_SCL			0x400001c3
+			MX8MM_IOMUXC_I2C2_SDA_I2C2_SDA			0x400001c3
+		>;
+	};
+
+	pinctrl_sai3: sai3grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI3_TXFS_SAI3_TX_SYNC		0xd6
+			MX8MM_IOMUXC_SAI3_TXC_SAI3_TX_BCLK		0xd6
+			MX8MM_IOMUXC_SAI3_TXD_SAI3_TX_DATA0		0xd6
+			MX8MM_IOMUXC_SAI3_RXD_SAI3_RX_DATA0		0xd6
+		>;
+	};
+};
+
+/ {
+	fragment@3 {
+		target-path = "/";
+		__overlay__ {
+			sound-wm8960 {
+				compatible = "simple-audio-card";
+				simple-audio-card,name = "wm8960-sound-audio";
+				simple-audio-card,bitclock-master = <&dailink_master>;
+				simple-audio-card,frame-master = <&dailink_master>;
+				simple-audio-card,format = "i2s";
+				status = "okay";
+				simple-audio-card,widgets =
+						"Microphone", "Mic Jack",
+						"Line", "Line In",
+						"Line", "Line Out",
+						"Speaker", "Speaker",
+						"Headphone", "Headphone Jack";
+				simple-audio-card,routing =
+						"Headphone Jack", "HP_L",
+						"Headphone Jack", "HP_R",
+						"Speaker", "SPK_LP",
+						"Speaker", "SPK_LN",
+						"Speaker", "SPK_RP",
+						"Speaker", "SPK_RN",
+						"LINPUT1", "Mic Jack",
+						"LINPUT3", "Mic Jack",
+						"RINPUT1", "Mic Jack",
+						"RINPUT2", "Mic Jack",
+						"Mic Jack", "MICB";
+
+				simple-audio-card,cpu {
+					sound-dai = <&sai3>;
+				};
+
+				dailink_master: simple-audio-card,codec {
+					sound-dai = <&wm8960>;
+					clocks = <&wm8960_osc>;
+				};
+			};
+
+			wm8960_osc: wm8960_mclk {
+					compatible = "fixed-clock";
+					#clock-cells = <0>;
+					clock-frequency = <24000000>;
+					clock-output-names = "wm8960-mclk";
+			};
+		};
+	};
+};
