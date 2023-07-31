@@ -35,6 +35,39 @@
 		off-on-delay-us = <12000>;
 		enable-active-high;
 	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		status = "okay";
+
+		sys_led {
+				label = "sys_led";
+				gpios = <&gpio3 25 0>;
+				default-state = "on";
+				linux,default-trigger = "heartbeat";
+		};
+
+		usr_led {
+				label = "usr_led";
+				gpios = <&gpio3 19 0>;
+				default-state = "on";
+		};
+
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_keys>;
+
+		usr {
+			label = "usr_key";
+			gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+			linux,code = <BTN_0>;
+		};
+	};
 };
 
 /* CPU 4 cores */
@@ -251,8 +284,8 @@
 			MX8MN_IOMUXC_ENET_RD0_ENET1_RGMII_RD0	0x91
 			MX8MN_IOMUXC_ENET_TXC_ENET1_RGMII_TXC	0x1f
 			MX8MN_IOMUXC_ENET_RXC_ENET1_RGMII_RXC	0x91
-			MX8MN_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91
-			MX8MN_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x1f
+			MX8MN_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL 0x91
+			MX8MN_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL 0x1f
 			MX8MN_IOMUXC_SAI2_RXC_GPIO4_IO22	0x19
 		>;
 	};
@@ -376,6 +409,19 @@
 	pinctrl_wdog: wdoggrp {
 		fsl,pins = <
 			MX8MN_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B		0x166
+		>;
+	};
+
+	pinctrl_gpio_leds: gpio_ledsgrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_SAI5_MCLK_GPIO3_IO25			0x19
+			MX8MN_IOMUXC_SAI5_RXFS_GPIO3_IO19			0x19
+		>;
+	};
+
+	pinctrl_gpio_keys: gpio_keysgrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_GPIO1_IO07_GPIO1_IO7			0x144
 		>;
 	};
 };
