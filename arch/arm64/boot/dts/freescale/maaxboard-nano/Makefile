@@ -11,3 +11,4 @@ dtb-y += ext-pwm1.dtbo
 dtb-y += ext-pwm2.dtbo
 dtb-y += ext-pwm3.dtbo
 dtb-y += ext-spi1.dtbo
+dtb-y += ext-uart4.dtbo
