@@ -77,6 +77,17 @@
 		};
 	};
 
+	sound-micfil {
+		compatible = "fsl,imx-audio-card";
+		model = "imx-audio-micfil";
+		pri-dai-link {
+			link-name = "micfil hifi";
+			cpu {
+				sound-dai = <&micfil>;
+			};
+		};
+	};
+
 	cs4344: cs4344 {
 		#sound-dai-cells = <0>;
 		compatible = "cirrus,cs4344";
@@ -361,6 +372,16 @@
 	};
 };
 
+&micfil {
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pdm>;
+	assigned-clocks = <&clk IMX8MN_CLK_PDM>;
+	assigned-clock-parents = <&clk IMX8MN_AUDIO_PLL1_OUT>;
+	assigned-clock-rates = <196608000>;
+	status = "okay";
+};
+
 &sai5 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai5>;
@@ -376,6 +397,7 @@
 	fsl,asrc-rate = <48000>;
 	status = "okay";
 };
+
 
 &iomuxc {
 	pinctrl_fec1: fec1grp {
@@ -470,6 +492,7 @@
 			MX8MN_IOMUXC_SD1_DATA3_USDHC1_DATA3	0x1d6
 		>;
 	};
+
 
 	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
 		fsl,pins = <
@@ -588,6 +611,14 @@
 			MX8MN_IOMUXC_NAND_DATA01_QSPI_A_DATA1		0x82
 			MX8MN_IOMUXC_NAND_DATA02_QSPI_A_DATA2		0x82
 			MX8MN_IOMUXC_NAND_DATA03_QSPI_A_DATA3		0x82
+		>;
+	};
+
+	pinctrl_pdm: pdmgrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_SAI5_RXC_PDM_CLK				0xd6
+			MX8MN_IOMUXC_SAI5_RXD0_PDM_BIT_STREAM0		0xd6
+			MX8MN_IOMUXC_SAI5_RXD1_PDM_BIT_STREAM1		0xd6
 		>;
 	};
 
