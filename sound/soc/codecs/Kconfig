@@ -80,6 +80,7 @@ config SND_SOC_ALL_CODECS
 	imply SND_SOC_CS42XX8_I2C
 	imply SND_SOC_CS43130
 	imply SND_SOC_CS4341
+	imply SND_SOC_CS4344
 	imply SND_SOC_CS4349
 	imply SND_SOC_CS47L15
 	imply SND_SOC_CS47L24
@@ -789,6 +790,9 @@ config SND_SOC_CS4341
 	depends on SND_SOC_I2C_AND_SPI
 	select REGMAP_I2C if I2C
 	select REGMAP_SPI if SPI_MASTER
+
+config SND_SOC_CS4344
+	tristate "Cirrus Logic CS4344 DAC"
 
 # Cirrus Logic CS4349 HiFi DAC
 config SND_SOC_CS4349

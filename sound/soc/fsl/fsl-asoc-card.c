@@ -49,6 +49,7 @@ enum fsl_asoc_card_type {
 	CARD_WM8524,
 	CARD_SI476X,
 	CARD_WM8958,
+	CARD_CS4344,
 };
 
 /**
@@ -870,6 +871,15 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 		priv->card.dapm_routes = NULL;
 		priv->card.num_dapm_routes = 0;
 		priv->card_type = CARD_WM8958;
+	} else if (of_device_is_compatible(np, "fsl,imx-audio-cs4344")) {
+		codec_dai_name = "cs4344-hifi";
+		priv->dai_fmt |= SND_SOC_DAIFMT_CBC_CFC;
+		priv->dai_link[1].dpcm_capture = 0;
+		priv->dai_link[2].dpcm_capture = 0;
+		priv->cpu_priv.slot_width = 32;
+		priv->card.dapm_routes = audio_map_tx;
+		priv->card.num_dapm_routes = ARRAY_SIZE(audio_map_tx);
+		priv->card_type = CARD_CS4344;
 	} else {
 		dev_err(&pdev->dev, "unknown Device Tree compatible\n");
 		ret = -EINVAL;
@@ -1193,7 +1203,7 @@ static const struct of_device_id fsl_asoc_card_dt_ids[] = {
 	{ .compatible = "fsl,imx-audio-mqs", },
 	{ .compatible = "fsl,imx-audio-wm8524", },
 	{ .compatible = "fsl,imx-audio-si476x", },
-	{ .compatible = "fsl,imx-audio-wm8958", },
+	{ .compatible = "fsl,imx-audio-cs4344", },
 	{}
 };
 MODULE_DEVICE_TABLE(of, fsl_asoc_card_dt_ids);
