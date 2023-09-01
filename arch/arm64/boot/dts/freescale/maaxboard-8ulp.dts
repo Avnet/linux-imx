@@ -177,6 +177,23 @@
 		pinctrl-0 = <&pinctrl_wlan>;
 		reset-gpios = <&gpiod 23 GPIO_ACTIVE_LOW>;
 	};
+
+	rpmsg_audio: rpmsg-audio {
+		compatible = "fsl,imx8ulp-rpmsg-audio";
+		model = "da7212-audio";
+		fsl,rpmsg-out;
+		fsl,rpmsg-in;
+		audio-codec = <&da7212>;
+		memory-region = <&audio_reserved>;
+
+		audio-routing =
+			"MIC1", "Mic Jack",
+			"Mic Jack", "Mic Bias 1",
+			"Headphone Jack", "HPL",
+			"Headphone Jack", "HPR";
+
+		status = "okay";
+	};
 };
 
 /*+--------------------+
@@ -324,6 +341,26 @@
 
 &usbmisc2 {
 	status = "okay";
+};
+
+/*+-------------------------+
+  |   Audio/Camera Module   |
+  +-------------------------+*/
+
+&i2c_rpbus_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	da7212: codec@1a {
+		compatible = "dlg,da7212";
+		#sound-dai-cells = <0>;
+		reg = <0x1a>;
+		dlg,micbias1-lvl = <2500>;
+		dlg,micbias2-lvl = <2500>;
+		clocks = <&da7212_mclk>;
+		clock-names = "mclk";
+	};
 };
 
 /*+---------------+
