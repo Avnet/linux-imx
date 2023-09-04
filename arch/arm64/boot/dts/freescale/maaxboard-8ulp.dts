@@ -194,6 +194,15 @@
 
 		status = "okay";
 	};
+
+	backlight: pwm-backlight {
+		compatible = "pwm-backlight";
+		pwms = <&tpm_rpchip_3 5 50000 0>;
+		brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <8>;
+		enable-pwm-on;
+		status = "disabled";
+	};
 };
 
 /*+--------------------+
@@ -341,6 +350,61 @@
 
 &usbmisc2 {
 	status = "okay";
+};
+
+/*+---------------------+
+  | MIPI-DSI LCD Module |
+  +---------------------+*/
+
+&dcnano {
+	status = "disabled";
+};
+
+&dphy {
+	status = "disabled";
+};
+
+&dsi {
+	status = "disabled";
+};
+
+&i2c_rpbus_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "disabled";
+
+	/* touch screen for avnet,ph720128t005 */
+	gt911: gt911_ts@14 {
+		compatible = "goodix,gt911";
+		reg = <0x14>;
+		interrupt-parent = <&rpmsg_gpioa>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&rpmsg_gpioa 5 GPIO_ACTIVE_HIGH>;
+		irq-gpios = <&rpmsg_gpioa 19 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		edge-failling-trigger;
+		status = "disabled";
+	};
+
+	/* touch screen for avnet,ph720128t003 */
+	ft5426: ft5426_ts@38 {
+		compatible = "focaltech,fts";
+		reg = <0x38>;
+		interrupt-parent = <&rpmsg_gpioa>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		focaltech,reset-gpio = <&rpmsg_gpioa 5 GPIO_ACTIVE_HIGH>;
+		focaltech,irq-gpio = <&rpmsg_gpioa 19 GPIO_ACTIVE_HIGH>;
+		focaltech,max-touch-number = <10>;
+		focaltech,panel-type = <0x54260002>; /* _FT5426 */
+		focaltech,display-coords =	<0 0 720 1280>;
+		focaltech,have-key;
+		focaltech,key-number = <3>;
+		focaltech,keys = <139 102 158>;
+		focaltech,key-y-coord = <2000>;
+		focaltech,key-x-coords = <200 600 800>;
+		status = "disabled";
+	};
 };
 
 /*+-------------------------+
