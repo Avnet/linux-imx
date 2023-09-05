@@ -14,3 +14,4 @@ dtb-y += ext-spi1.dtbo
 dtb-y += ext-uart4.dtbo
 dtb-y += display-mipi.dtbo
 dtb-y += camera-ov5640.dtbo
+dtb-y += ext-wm8960.dtbo
