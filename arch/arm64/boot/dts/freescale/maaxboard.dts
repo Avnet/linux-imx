@@ -82,6 +82,26 @@
             linux,code = <KEY_PREVIOUS>;
         };  
     };
+
+    regulators {
+        compatible = "simple-bus";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        reg_usb1_en: regulator-usb1-vcc {
+            compatible = "regulator-fixed";
+            pinctrl-names = "default";
+            pinctrl-0 = <&pinctrl_usb1_pwr_en>;
+            regulator-name = "usb1_pwr_en";
+            regulator-min-microvolt = <3300000>;
+            regulator-max-microvolt = <3300000>;
+            enable-active-high;
+            regulator-always-on;
+            regulator-boot-on;
+            startup-delay-us = <160000>;
+            gpio = <&gpio1 12 GPIO_ACTIVE_LOW>;
+        };
+	}; 
 };
 
 &A53_0 {
@@ -307,6 +327,24 @@
 	status = "okay";
 };
 
+&usb3_phy0 {
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	dr_mode = "host";
+	status = "okay";
+};
+
+&usb3_phy1 {
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	dr_mode = "host";
+	status = "okay";
+};
+
 &wdog1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_wdog>;
@@ -425,6 +463,12 @@
         fsl,pins = < 
             MX8MQ_IOMUXC_NAND_DATA01_GPIO3_IO7          0x56
             MX8MQ_IOMUXC_NAND_DATA00_GPIO3_IO6          0x56
+        >;
+    };
+
+    pinctrl_usb1_pwr_en: usb1_pwr_en {
+        fsl,pins = < 
+            MX8MQ_IOMUXC_GPIO1_IO12_GPIO1_IO12      0x16  /* USB1_EN */
         >;
     };
 
