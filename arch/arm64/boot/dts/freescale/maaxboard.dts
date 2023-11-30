@@ -101,7 +101,35 @@
             startup-delay-us = <160000>;
             gpio = <&gpio1 12 GPIO_ACTIVE_LOW>;
         };
+
+        reg_3V3WF: regulator@1 {
+            compatible = "regulator-fixed";
+            reg = <1>;
+            pinctrl-names = "default";
+            pinctrl-0 = <&pinctrl_reg3V3wf>;
+            regulator-name = "WF_3V3";
+            regulator-min-microvolt = <3300000>;
+            regulator-max-microvolt = <3300000>;
+            gpio = <&gpio2 20 0>;  /* WB_PWR_EN */
+            regulator-always-on;
+            enable-active-high;
+        };
 	}; 
+
+    wlan_pwrseq: sdio-pwrseq {
+        compatible = "mmc-pwrseq-simple";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_wlan>;
+        reset-gpios = <&gpio2 19 GPIO_ACTIVE_LOW>;    /* WL_REG_ON */
+    };
+
+    bt_reset: bt_reset{
+        compatible = "gpio-reset";
+        reset-gpios = <&gpio5 11 GPIO_ACTIVE_LOW>;    /* BT_REG_ON */
+        reset-delay-us = <1000>;
+        reset-post-delay-ms = <40>;
+        #reset-cells = <0>;
+    };
 };
 
 &A53_0 {
@@ -327,6 +355,41 @@
 	status = "okay";
 };
 
+/* WiFi on SDHC2 */
+&usdhc2 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_usdhc2>;
+    bus-width = <4>;
+    vmmc-supply = <&reg_3V3WF>;
+    mmc-pwrseq = <&wlan_pwrseq>;
+    no-1-8-v;
+    non-removable;
+    pm-ignore-notify;
+    keep-power-in-suspend;
+    status = "okay";
+
+    #address-cells = <1>;
+    #size-cells = <0>;
+    brcmf: bcrmf@1 {
+            reg = <1>;
+            compatible = "brcm,bcm4329-fmac";
+            interrupt-parent = <&gpio2>;
+            interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
+            interrupt-names = "host-wake";
+        };  
+};
+
+/* Bluetooth on UART4 */
+&uart4 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_uart4>;
+    assigned-clocks = <&clk IMX8MQ_CLK_UART4>;
+    assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_80M>;
+    fsl,uart-has-rtscts;
+    resets = <&bt_reset>;
+    status = "okay";
+};
+
 &usb3_phy0 {
 	status = "okay";
 };
@@ -469,6 +532,41 @@
     pinctrl_usb1_pwr_en: usb1_pwr_en {
         fsl,pins = < 
             MX8MQ_IOMUXC_GPIO1_IO12_GPIO1_IO12      0x16  /* USB1_EN */
+        >;
+    };
+
+    pinctrl_usdhc2: usdhc2grp {
+        fsl,pins = < 
+            MX8MQ_IOMUXC_SD2_CLK_USDHC2_CLK         0x83
+            MX8MQ_IOMUXC_SD2_CMD_USDHC2_CMD         0xc3
+            MX8MQ_IOMUXC_SD2_DATA0_USDHC2_DATA0     0xc3
+            MX8MQ_IOMUXC_SD2_DATA1_USDHC2_DATA1     0xc3
+            MX8MQ_IOMUXC_SD2_DATA2_USDHC2_DATA2     0xc3
+            MX8MQ_IOMUXC_SD2_DATA3_USDHC2_DATA3     0xc3
+        >;
+    };
+
+    pinctrl_wlan: wlangrp {
+        fsl,pins = < 
+            MX8MQ_IOMUXC_SD2_RESET_B_GPIO2_IO19         0x19 /* WL_REG_ON */
+            MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12            0x19 /* WL_HOST_WAKE irq */
+            MX8MQ_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K  0x05 /* 32K CLK IN */
+        >;
+    };  
+
+    pinctrl_reg3V3wf: reg3V3wfgrp {
+        fsl,pins = < 
+            MX8MQ_IOMUXC_SD2_WP_GPIO2_IO20              0x19 /* WB_PWR_EN */
+        >;
+    };  
+
+    pinctrl_uart4: uart4grp {
+        fsl,pins = <
+            MX8MQ_IOMUXC_UART4_RXD_UART4_DCE_RX         0x49
+            MX8MQ_IOMUXC_UART4_TXD_UART4_DCE_TX         0x49
+            MX8MQ_IOMUXC_ECSPI2_SS0_UART4_DCE_RTS_B     0x49
+            MX8MQ_IOMUXC_ECSPI2_MISO_UART4_DCE_CTS_B    0x49
+            MX8MQ_IOMUXC_ECSPI2_MOSI_GPIO5_IO11         0x19
         >;
     };
 
