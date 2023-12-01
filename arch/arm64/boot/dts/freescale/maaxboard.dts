@@ -698,6 +698,14 @@
 	};
 };
 
+&vpu {
+	status = "okay";
+};
+
+&gpu3d {
+	status = "okay";
+};
+
 &irqsteer {
 	status = "okay";
 };
