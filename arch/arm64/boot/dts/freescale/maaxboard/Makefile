@@ -13,3 +13,4 @@ dtb-y += ext-spi1.dtbo
 dtb-y += ext-uart2.dtbo
 dtb-y += usb0-device.dtbo
 dtb-y += display-hdmi.dtbo
+dtb-y += display-mipi.dtbo
