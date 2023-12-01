@@ -509,6 +509,30 @@
     };  
 };
 
+/* MIPI-CSI2 Camera */
+&csi1_bridge { 
+    fsl,mipi-mode; 
+    fsl,two-8bit-sensor-mode; 
+    status = "disabled"; 
+    
+    port {
+        csi1_ep: endpoint { 
+            remote-endpoint = <&csi1_mipi_ep>;
+        };
+    };
+};
+
+&mipi_csi_1 { 
+    #address-cells = <1>; 
+    #size-cells = <0>; 
+    status = "disabled"; 
+    port {
+        csi1_mipi_ep: endpoint@1 {
+            remote-endpoint = <&csi1_ep>;
+        };
+    };
+};
+
 &wdog1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_wdog>;
@@ -690,6 +714,13 @@
             MX8MQ_IOMUXC_I2C4_SDA_I2C4_SDA          0x4000007f
         >;
     };
+
+    pinctrl_csi1: csi1grp {
+        fsl,pins = < 
+            MX8MQ_IOMUXC_NAND_WP_B_GPIO3_IO18       0x19
+            MX8MQ_IOMUXC_NAND_DQS_GPIO3_IO14        0x19
+        >;
+    }; 
 
 	pinctrl_wdog: wdog1grp {
 		fsl,pins = <

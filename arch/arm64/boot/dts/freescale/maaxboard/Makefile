@@ -15,3 +15,4 @@ dtb-y += usb0-device.dtbo
 dtb-y += display-hdmi.dtbo
 dtb-y += display-mipi.dtbo
 dtb-y += display-dual.dtbo
+dtb-y += camera-ov5640.dtbo
