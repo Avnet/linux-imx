@@ -16,3 +16,4 @@ dtb-y += display-hdmi.dtbo
 dtb-y += display-mipi.dtbo
 dtb-y += display-dual.dtbo
 dtb-y += camera-ov5640.dtbo
+dtb-y += ext-wm8960.dtbo
