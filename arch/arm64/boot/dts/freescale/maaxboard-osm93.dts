@@ -206,12 +206,11 @@
 		compatible = "snps,dwmac-mdio";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		clock-frequency = <5000000>;
 
 		ethphy1: ethernet-phy@4 {
-			compatible = "ethernet-phy-ieee802.3-c22";
+			compatible = "ethernet-phy-id0022.1642",
+				     "ethernet-phy-ieee802.3-c22";
 			reg = <4>;
-			eee-broken-1000t;
 		};
 	};
 };
@@ -227,12 +226,11 @@
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		clock-frequency = <5000000>;
 
 		ethphy2: ethernet-phy@5 {
-			compatible = "ethernet-phy-ieee802.3-c22";
+			compatible = "ethernet-phy-id0022.1642",
+				     "ethernet-phy-ieee802.3-c22";
 			reg = <5>;
-			eee-broken-1000t;
 		};
 	};
 };
