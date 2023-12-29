@@ -230,8 +230,68 @@
 				"GPIO_B_4", "GPIO_B_5", "GPIO_B_6", "GPIO_B_7";
 		status = "okay";
 	};
+
+	ov5640_mipi: ov5640_mipi@3c {
+		reg = <0x3c>;
+		clocks = <&clk IMX93_CLK_CCM_CKO3>;
+		assigned-clocks = <&clk IMX93_CLK_CCM_CKO3>;
+		assigned-clock-rates = <28000000>;
+		compatible = "ovti,ov5640";
+		clock-names = "xclk";
+		powerdown-gpios = <&ioexpander1 6 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&ioexpander1 7 GPIO_ACTIVE_LOW>;
+		csi_id = <0>;
+		mclk = <25000000>;
+		mclk_source = <0>;
+		status = "okay";
+
+		port {
+			ov5640_mipi_ep: endpoint {
+				remote-endpoint = <&mipi_csi_ep>;
+				data-lanes = <2>;
+				cfg-clk-range = <28>;
+				hs-clk-range = <0x16>;
+			};
+		};
+	};
 };
 
+&epxp {
+	status = "okay";
+};
+
+&media_blk_ctrl {
+    status = "okay";
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+};
+
+&mipi_csi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	port@0 {
+		reg = <0>;
+		mipi_csi_ep: endpoint {
+			remote-endpoint = <&ov5640_mipi_ep>;
+			data-lanes = <2>;
+			cfg-clk-range = <28>;
+			hs-clk-range = <0x16>;
+			bus-type = <4>;
+		};
+	};
+};
 
 &lpuart1 { /* console */
 	pinctrl-names = "default";
