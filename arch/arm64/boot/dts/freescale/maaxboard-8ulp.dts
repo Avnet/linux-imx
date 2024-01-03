@@ -107,6 +107,14 @@
 		};
 	};
 
+	/* It's a 25MHz crystal oscillator on OV5640 camera board */
+	cam_xtal: cam-xtal{
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <25000000>;
+		clock-output-names = "cam_xtal";
+	};
+
 	clock_ext_rmii: clock-ext-rmii {
 		compatible = "fixed-clock";
 		clock-frequency = <50000000>;
@@ -429,7 +437,7 @@
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
-		clocks = <&cgc2 IMX8ULP_CLK_DSI_PHY_REF>;
+		clocks = <&cam_xtal>;
 		clock-names = "xclk";
 		powerdown-gpios = <&rpmsg_gpioc 23 GPIO_ACTIVE_LOW>;
 		status = "disabled";
