@@ -397,6 +397,7 @@ DTC_FLAGS_maaxboard-8ulp := -@
 
 dtb-$(CONFIG_ARCH_MXC) += \
 	maaxboard.dtb \
+	maaxboard-mini.dtb \
 	maaxboard-8ulp.dtb
 
 subdir-$(CONFIG_ARCH_MXC) += \

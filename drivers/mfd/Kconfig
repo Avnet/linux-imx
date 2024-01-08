@@ -2047,6 +2047,13 @@ config MFD_ROHM_BD718XX
 	  NXP i.MX8. It contains 8 BUCK outputs and 7 LDOs, voltage monitoring
 	  and emergency shut down as well as 32,768KHz clock output.
 
+config MFD_ROHM_BD718X7_REBOOT
+	tristate "Support reboot by BD71847 on MaaXBoard-Mini"
+	depends on MFD_ROHM_BD718XX
+	default n
+	help
+	  Say Y here if you want to support reboot system by ROHM BD71847.
+
 config MFD_ROHM_BD71828
 	tristate "ROHM BD71828 and BD71815 Power Management IC"
 	depends on I2C=y

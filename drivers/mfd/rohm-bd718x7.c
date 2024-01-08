@@ -18,6 +18,11 @@
 #include <linux/regmap.h>
 #include <linux/types.h>
 
+#ifdef CONFIG_MFD_ROHM_BD718X7_REBOOT
+#include <linux/reboot.h>
+static struct regmap *bd718x7_regmap;
+#endif
+
 static struct gpio_keys_button button = {
 	.code = KEY_POWER,
 	.gpio = -1,
@@ -90,6 +95,30 @@ static const struct regmap_config bd718xx_regmap_config = {
 	.max_register = BD718XX_MAX_REGISTER - 1,
 	.cache_type = REGCACHE_RBTREE,
 };
+
+#ifdef CONFIG_MFD_ROHM_BD718X7_REBOOT
+void pmic_bd718x7_reboot(void)
+{
+	regmap_update_bits(bd718x7_regmap, BD718XX_REG_SWRESET, BD718XX_SWRESET_RESET_MASK,
+			BD718XX_SWRESET_RESET|BD718XX_SWRESET_TYPE_COLD);
+
+	return ;
+}
+EXPORT_SYMBOL_GPL(pmic_bd718x7_reboot);
+
+static int bd718x7_reset_handle(struct notifier_block *this, unsigned long mode, void *cmd)
+{
+	regmap_update_bits(bd718x7_regmap, BD718XX_REG_SWRESET, BD718XX_SWRESET_RESET_MASK,
+			BD718XX_SWRESET_RESET|BD718XX_SWRESET_TYPE_COLD);
+
+	return NOTIFY_DONE;
+}
+
+static struct notifier_block bd718x7_restart_handler = {
+	.notifier_call = bd718x7_reset_handle,
+	.priority = 192,
+};
+#endif
 
 static int bd718xx_init_press_duration(struct regmap *regmap,
 				       struct device *dev)
@@ -184,12 +213,24 @@ static int bd718xx_i2c_probe(struct i2c_client *i2c,
 
 	button.irq = ret;
 
+#ifdef CONFIG_MFD_ROHM_BD718X7_REBOOT /* MaaxBoard-Mini reboot by PMIC */
+
+	/* must register bd718x7_restart_handler here even it's not used,
+	 * or pmic_bd718x7_reboot() can not work. */
+
+	bd718x7_regmap = regmap;
+	ret = register_restart_handler(&bd718x7_restart_handler);
+	if (ret) {
+		dev_err(&i2c->dev, "cannot register restart handler, %d\n", ret);
+		return ret;
+	}
+#else /* kernel will stuck at here on MaaXBoard-Mini */
 	ret = devm_mfd_add_devices(&i2c->dev, PLATFORM_DEVID_AUTO,
 				   mfd, cells, NULL, 0,
 				   regmap_irq_get_domain(irq_data));
 	if (ret)
 		dev_err(&i2c->dev, "Failed to create subdevices\n");
-
+#endif
 	return ret;
 }
 
