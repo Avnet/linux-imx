@@ -21,6 +21,22 @@
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};
 
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_usb1_power: regulator-usb-3v3 {
+			compatible = "regulator-fixed";
+			regulator-name = "usb1-power-en";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+			off-on-delay = <1000>;
+			startup-delay-us = <300>;
+		};
+	};
+
 };
 
 /* CPU 4 cores */
@@ -84,6 +100,21 @@
 			at803x,vddio-1p8v;
 		};
 	};
+};
+
+/* Two USB2.0 Host */
+&usbotg1 {
+	dr_mode = "host";
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
+	status = "okay";
+};
+
+&usbotg2 {
+	dr_mode = "host";
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
+	status = "okay";
 };
 
 /* Press this key for 8 seconds will shutdown */
@@ -320,6 +351,13 @@
 			MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL 0x91
 			MX8MM_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL 0x1f
 			MX8MM_IOMUXC_GPIO1_IO07_GPIO1_IO7			0x19
+		>;
+	};
+
+	/* USB power enable */
+	pinctrl_usb_pwren: usb_pwrengrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12			0x02
 		>;
 	};
 };
