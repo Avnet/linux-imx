@@ -90,6 +90,54 @@
 	};
 };
 
+&lpi2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpi2c1>;
+	pinctrl-1 = <&pinctrl_lpi2c1>;
+	status = "okay";
+
+	/* touch screen for avnet,ph720128t005 */
+	gt911: gt911_ts@14 {
+		compatible = "goodix,gt911";
+		reg = <0x14>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		interrupt-parent = <&ioexpander1>;
+		interrupts = <0 IRQ_TYPE_EDGE_RISING>;
+		irq-gpios = <&ioexpander1 0 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		edge-failling-trigger;
+		status = "okay";
+	};
+
+	/* touch screen for avnet,ph720128t003 */
+	ft5426: ft5426_ts@38 {
+		compatible = "focaltech,fts";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		interrupt-parent = <&ioexpander1>;
+		interrupts = <0 IRQ_TYPE_EDGE_RISING>;
+		focaltech,reset-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		focaltech,irq-gpio = <&ioexpander1 0 GPIO_ACTIVE_HIGH>;
+		focaltech,max-touch-number = <10>;
+		focaltech,panel-type = <0x54260002>; /* _FT5426 */
+		focaltech,display-coords =	<0 0 720 1280>;
+		focaltech,have-key;
+		focaltech,key-number = <3>;
+		focaltech,keys = <139 102 158>;
+		focaltech,key-y-coord = <2000>;
+		focaltech,key-x-coords = <200 600 800>;
+		status = "disabled";
+	};
+
+};
+
 &lpi2c2 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -418,6 +466,13 @@
 };
 
 &iomuxc {
+	pinctrl_lpi2c1: lpi2c1grp {
+		fsl,pins = <
+			MX93_PAD_I2C1_SCL__LPI2C1_SCL			0x40000b9e
+			MX93_PAD_I2C1_SDA__LPI2C1_SDA			0x40000b9e
+		>;
+	};
+
 	pinctrl_lpi2c2: lpi2c2grp {
 		fsl,pins = <
 			MX93_PAD_I2C2_SCL__LPI2C2_SCL			0x40000b9e
@@ -526,6 +581,12 @@
 	pinctrl_gpio_backlight: backlight_grp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO06__GPIO2_IO06	0x11e
+		>;
+	};
+
+	pinctrl_ts: ts_pinsgrp {
+		fsl,pins = <
+			MX93_PAD_PDM_BIT_STREAM1__GPIO1_IO10	   0x31e  /* DSI_TS_RST  */
 		>;
 	};
 };

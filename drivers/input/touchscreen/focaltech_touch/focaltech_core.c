@@ -1140,18 +1140,6 @@ static int fts_ts_probe(struct i2c_client *client,
 	fts_reset_proc(200);
 	fts_wait_tp_to_valid(client);
 
-	err =
-	    request_threaded_irq(client->irq, NULL, fts_ts_interrupt,
-				 pdata->irq_gpio_flags | IRQF_ONESHOT |
-				 IRQF_TRIGGER_FALLING, client->dev.driver->name,
-				 data);
-	if (err) {
-		FTS_ERROR("Request irq failed!");
-		goto free_gpio;
-	}
-
-	fts_irq_disable();
-
 #if FTS_PSENSOR_EN
 	if (fts_sensor_init(data) != 0) {
 		FTS_ERROR("fts_sensor_init failed!");
@@ -1174,7 +1162,15 @@ static int fts_ts_probe(struct i2c_client *client,
 	fts_esdcheck_init();
 #endif
 
-	fts_irq_enable();
+	err =
+	    request_threaded_irq(client->irq, NULL, fts_ts_interrupt,
+				 pdata->irq_gpio_flags | IRQF_ONESHOT |
+				 IRQF_TRIGGER_FALLING, client->dev.driver->name,
+				 data);
+	if (err) {
+		FTS_ERROR("Request irq failed!");
+		goto free_gpio;
+	}
 
 #if FTS_TEST_EN
 	fts_test_init(client);
