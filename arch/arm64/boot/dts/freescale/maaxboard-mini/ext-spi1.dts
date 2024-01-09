@@ -1,0 +1,49 @@
+/*
+ * Copyright 2023 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mm-clock.h>
+#include <dt-bindings/gpio/gpio.h>
+#include "../imx8mm-pinfunc.h"
+
+/* 40-pin extended GPIO, expanded into SPI1 */
+
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	spidev@0 {
+		compatible = "fsl,spidev", "semtech,sx1301";
+		reg = <0>;
+		spi-max-frequency = <2000000>;
+	};
+};
+
+&iomuxc {
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9		0x40
+			MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x82
+			MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x82
+			MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x82
+		>;
+	};
+};

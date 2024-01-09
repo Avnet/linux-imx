@@ -394,6 +394,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-sof-cs42888.dtb imx8qm-mek-sof-wm8960.dtb \
 # MaaXBoard support
 DTC_FLAGS_maaxboard := -@
 DTC_FLAGS_maaxboard-8ulp := -@
+DTC_FLAGS_maaxboard-mini := -@
 
 dtb-$(CONFIG_ARCH_MXC) += \
 	maaxboard.dtb \
@@ -402,4 +403,5 @@ dtb-$(CONFIG_ARCH_MXC) += \
 
 subdir-$(CONFIG_ARCH_MXC) += \
 	maaxboard \
+	maaxboard-mini \
 	maaxboard-8ulp
