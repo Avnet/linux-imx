@@ -91,6 +91,16 @@
 		#reset-cells = <0>;
 	};
 
+	/* MiPi LCD backlight */
+	backlight: pwm-backlight {
+			compatible = "pwm-backlight";
+			pwms = <&pwm4 0 40000 0>;
+			brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
+			default-brightness-level = <8>;
+			enable-pwm-on;
+			status = "disabled";
+	};
+
 };
 
 /* CPU 4 cores */
@@ -204,6 +214,66 @@
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	resets = <&bt_reset>;
 	status = "okay";
+};
+
+/* MIPI-DSI LCD and Touch Screen */
+&pwm4 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pwm4>;
+        status = "disabled";
+};
+
+&lcdif {
+	status = "disabled";
+	max-memory-bandwidth = <221257728>; /* 720x1280-32@60.02 */
+};
+
+&mipi_dsi {
+	status = "disabled";
+};
+
+&i2c4 {
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c4>;
+	status = "disabled";
+
+	/* For Avnet PH720128T003 LCD display */
+	ft5426: ft5426_ts@38 {
+		status = "disabled";
+		compatible = "focaltech,fts";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		focaltech,irq-gpio = <&gpio3 19 GPIO_ACTIVE_LOW>;
+		focaltech,reset-gpio = <&gpio3 20 GPIO_ACTIVE_LOW>;
+		focaltech,max-touch-number = <10>;
+		focaltech,panel-type = <0x54260002>; /* _FT5426 */
+		focaltech,display-coords =  <0 0 720 1280>;
+		focaltech,have-key;
+		focaltech,key-number = <3>;
+		focaltech,keys = <139 102 158>;
+		focaltech,key-y-coord = <2000>;
+		focaltech,key-x-coords = <200 600 800>;
+	};
+
+	/* For Avnet PH720128T005 LCD display */
+	gt911: gt911_ts@5d {
+		status = "disabled";
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		irq-gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio3 20 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		edge-failling-trigger;
+	};
 };
 
 /* Press this key for 8 seconds will shutdown */
@@ -503,6 +573,27 @@
 			MX8MM_IOMUXC_ECSPI2_MOSI_UART4_DCE_TX		0x140
 			MX8MM_IOMUXC_ECSPI2_MISO_UART4_DCE_CTS_B	0x140
 			MX8MM_IOMUXC_ECSPI2_SS0_UART4_DCE_RTS_B		0x140
+		>;
+	};
+
+	/* MIPI-DSI LCD and Touch Screen */
+	pinctrl_pwm4: pwm4_grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI3_MCLK_PWM4_OUT				0x06
+		>;
+	};
+
+	pinctrl_ts: ts_pinsgrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI5_RXFS_GPIO3_IO19			0x19  /* DSI_TS_nINT */
+			MX8MM_IOMUXC_SAI5_RXC_GPIO3_IO20			0x19  /* DSI_TS_RST  */
+		>;
+	};
+
+	pinctrl_i2c4: i2c4grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C4_SCL_I2C4_SCL				0x400001c3
+			MX8MM_IOMUXC_I2C4_SDA_I2C4_SDA				0x400001c3
 		>;
 	};
 };

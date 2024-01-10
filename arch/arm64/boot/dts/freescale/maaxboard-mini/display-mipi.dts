@@ -1,0 +1,73 @@
+/*
+ * Copyright 2023 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "../imx8mm-pinfunc.h"
+
+/* Device tree overlay for MIPI LCD and touchscreen */
+
+&mipi_dsi{
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel@0 {
+		//compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+		compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+		pwn-gpios = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+		dsi-lanes = <2>;
+		backlight = <&backlight>;
+		status = "okay";
+	};
+};
+
+&lcdif{
+	status = "okay";
+};
+
+&pwm4{
+	status = "okay";
+};
+
+&backlight{
+	status = "okay";
+};
+
+&i2c4{
+	status = "okay";
+};
+
+/* For Avnet PH720128T005 LCD display */
+&gt911{
+	status = "disabled";
+};
+
+/* For Avnet PH720128T003 LCD display */
+&ft5426{
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_mipi_dsi_en: mipi_dsi_en {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO09_GPIO1_IO9			0x16  /* DSI_EN */
+		>;
+	};
+};
