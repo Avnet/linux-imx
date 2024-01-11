@@ -38,6 +38,17 @@
 		clock-output-names = "cam_xtal";
 	};
 
+	reg_can_stby: regulator-can-stby {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_can>;
+		regulator-name = "can-stby";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio2 26 GPIO_ACTIVE_LOW>;
+		enable-active-low;
+	};
+
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -524,6 +535,20 @@
        status = "okay";
 };
 
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	xceiver-supply = <&reg_can_stby>;
+	status = "okay";
+};
+
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
+	xceiver-supply = <&reg_can_stby>;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
@@ -680,6 +705,26 @@
 			MX93_PAD_GPIO_IO15__LPUART3_RX		0x31e
 			MX93_PAD_GPIO_IO16__LPUART3_CTS_B	0x31e
 			MX93_PAD_GPIO_IO17__LPUART3_RTS_B	0x31e
+		>;
+	};
+
+	pinctrl_reg_can: regcangrp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO26__GPIO2_IO26		0x31e
+		>;
+	};
+
+	pinctrl_flexcan1: flexcan1grp {
+		fsl,pins = <
+			MX93_PAD_PDM_CLK__CAN1_TX			0x139e
+			MX93_PAD_PDM_BIT_STREAM0__CAN1_RX	0x139e
+		>;
+	};
+
+	pinctrl_flexcan2: flexcan2grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO25__CAN2_TX			0x139e
+			MX93_PAD_GPIO_IO27__CAN2_RX			0x139e
 		>;
 	};
 };
