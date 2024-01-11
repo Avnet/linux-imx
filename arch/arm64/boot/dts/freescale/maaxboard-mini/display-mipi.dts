@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 AVNET
+ * Copyright 2024 AVNET
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,8 +26,8 @@
 	#size-cells = <0>;
 
 	panel@0 {
-		//compatible = "avnet,ph720128t005", "ilitek,ili9881c";
-		compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
 		reg = <0>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
@@ -56,12 +56,12 @@
 
 /* For Avnet PH720128T005 LCD display */
 &gt911{
-	status = "disabled";
+	status = "okay";
 };
 
 /* For Avnet PH720128T003 LCD display */
 &ft5426{
-	status = "okay";
+	status = "disabled";
 };
 
 &iomuxc {
