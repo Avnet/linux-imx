@@ -100,6 +100,11 @@
 			};
 		};
 	};
+
+	usdhc3_pwrseq: usdhc3_pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
+	};
 };
 
 &lpi2c1 {
@@ -124,7 +129,7 @@
 		touchscreen-size-x = <720>;
 		touchscreen-size-y = <1280>;
 		edge-failling-trigger;
-		status = "okay";
+		status = "disabled";
 	};
 
 	/* touch screen for avnet,ph720128t003 */
@@ -487,6 +492,37 @@
 	status = "okay";
 };
 
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-1 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-2 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
+	mmc-pwrseq = <&usdhc3_pwrseq>;
+	max-frequency = <100000000>;
+	bus-width = <4>;
+	keep-power-in-suspend;
+	non-removable;
+	wakeup-source;
+	fsl,sdio-async-interrupt-enabled;
+	status = "okay";
+
+	wifi_wake_host {
+		compatible = "nxp,wifi-wake-host";
+		interrupt-parent = <&gpio3>;
+		interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-names = "host-wake";
+	};
+
+};
+
+&lpuart3 {
+       /* BlueTooth */
+       pinctrl-names = "default", "sleep";
+       pinctrl-0 = <&pinctrl_lpuart3>;
+       pinctrl-1 = <&pinctrl_lpuart3>;
+       status = "okay";
+};
+
 &iomuxc {
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
@@ -616,6 +652,33 @@
 		fsl,pins = <
 			MX93_PAD_GPIO_IO04__PDM_CLK             0x31e
 			MX93_PAD_GPIO_IO05__PDM_BIT_STREAM00	0x31e
+		>;
+	};
+
+	pinctrl_usdhc3: usdhc3grp {
+		fsl,pins = <
+			MX93_PAD_SD3_CLK__USDHC3_CLK		0x15fe
+			MX93_PAD_SD3_CMD__USDHC3_CMD		0x13fe
+			MX93_PAD_SD3_DATA0__USDHC3_DATA0	0x13fe
+			MX93_PAD_SD3_DATA1__USDHC3_DATA1	0x13fe
+			MX93_PAD_SD3_DATA2__USDHC3_DATA2	0x13fe
+			MX93_PAD_SD3_DATA3__USDHC3_DATA3	0x13fe
+		>;
+	};
+
+	pinctrl_usdhc3_wlan: usdhc3wlangrp {
+		fsl,pins = <
+			MX93_PAD_SD2_CD_B__GPIO3_IO00		0x31e /* wifi reset pin */
+			MX93_PAD_SD2_RESET_B__GPIO3_IO07	0x31e /* wifi wake pin */
+		>;
+	};
+
+	pinctrl_lpuart3: uart3grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO14__LPUART3_TX		0x31e
+			MX93_PAD_GPIO_IO15__LPUART3_RX		0x31e
+			MX93_PAD_GPIO_IO16__LPUART3_CTS_B	0x31e
+			MX93_PAD_GPIO_IO17__LPUART3_RTS_B	0x31e
 		>;
 	};
 };
