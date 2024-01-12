@@ -582,6 +582,25 @@
 	status = "okay";
 };
 
+&lpspi4 {
+	fsl,spi-num-chipselects = <1>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpspi4>;
+	pinctrl-1 = <&pinctrl_lpspi4>;
+	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	is25wp016d: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <1000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
+	};
+};
+
 &iomuxc {
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
@@ -764,6 +783,15 @@
 	pinctrl_rtc: regrtcgrp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO02__GPIO2_IO02		0x111e
+		>;
+	};
+
+	pinctrl_lpspi4: lpspi4grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO18__GPIO2_IO18		0x3fe
+			MX93_PAD_GPIO_IO19__LPSPI4_SIN		0x3fe
+			MX93_PAD_GPIO_IO20__LPSPI4_SOUT		0x3fe
+			MX93_PAD_GPIO_IO21__LPSPI4_SCK		0x3fe
 		>;
 	};
 };
