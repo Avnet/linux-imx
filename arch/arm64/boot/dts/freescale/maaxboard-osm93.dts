@@ -49,6 +49,13 @@
 		enable-active-low;
 	};
 
+	reg_vref_1v8: regulator-adc-vref {
+		compatible = "regulator-fixed";
+		regulator-name = "vref_1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -546,6 +553,11 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	xceiver-supply = <&reg_can_stby>;
+	status = "okay";
+};
+
+&adc1 {
+	vref-supply = <&reg_vref_1v8>;
 	status = "okay";
 };
 
