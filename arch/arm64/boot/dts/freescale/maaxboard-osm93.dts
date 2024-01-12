@@ -157,6 +157,12 @@
 		wakeup-source;
 	};
 
+	eeprom@50 {
+		compatible = "onnn,cat24c08", "atmel,24c08";
+		reg = <0x50>;
+		status = "okay";
+	};
+
 	/* touch screen for avnet,ph720128t005 */
 	gt911: gt911_ts@14 {
 		compatible = "goodix,gt911";
