@@ -402,7 +402,7 @@
 		clock-names = "xclk";
 		powerdown-gpios = <&ioexpander1 6 GPIO_ACTIVE_LOW>;
 		reset-gpios = <&ioexpander1 7 GPIO_ACTIVE_LOW>;
-		status = "okay";
+		status = "disabled";
 
 		port {
 			ov5640_mipi_ep: endpoint {
@@ -422,21 +422,21 @@
 };
 
 &cameradev {
-	status = "okay";
+	status = "disabled";
 };
 
 &isi_0 {
-	status = "okay";
+	status = "disabled";
 
 	cap_device {
-		status = "okay";
+		status = "disabled";
 	};
 };
 
 &mipi_csi {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "okay";
+	status = "disabled";
 
 	port@0 {
 		reg = <0>;

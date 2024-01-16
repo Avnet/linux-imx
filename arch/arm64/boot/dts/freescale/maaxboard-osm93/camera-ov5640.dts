@@ -1,0 +1,43 @@
+/*
+ * Copyright 2022 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "../imx93-pinfunc.h"
+
+/* Device tree overlay for OV5640 camera */
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+};
+
+&lpi2c5 {
+	ov5640_mipi: ov5640_mipi@3c {
+		status = "okay";
+	};
+};
+
+&mipi_csi {
+	status = "okay";
+};
+
