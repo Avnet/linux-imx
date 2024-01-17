@@ -20,6 +20,8 @@
 
 
 &lpi2c2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
 
 	wm8960: wm8960@1a {

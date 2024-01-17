@@ -515,7 +515,7 @@ static int wm8960_add_widgets(struct snd_soc_component *component)
 		if (strcmp(w->name, "OUT3 VMID") == 0)
 			wm8960->out3 = w;
 	}
-	
+
 	return 0;
 }
 
@@ -921,12 +921,16 @@ static int wm8960_set_bias_level_out3(struct snd_soc_component *component,
 				}
 			}
 
+
+			#if 0 /*--Note Cause: WM8960 has internal clock---*/
 			ret = wm8960_configure_clocking(component);
 			if (ret)
 				return ret;
 
 			/* Set VMID to 2x50k */
 			snd_soc_component_update_bits(component, WM8960_POWER1, 0x180, 0x80);
+			#endif
+
 			break;
 
 		case SND_SOC_BIAS_ON:
