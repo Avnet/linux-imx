@@ -452,6 +452,8 @@
 			compatible = "ethernet-phy-id0022.1642",
 					 "ethernet-phy-ieee802.3-c22";
 			reg = <4>;
+			eee-broken-100tx;
+			eee-broken-1000t;
 		};
 	};
 };
