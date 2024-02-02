@@ -484,7 +484,7 @@
 
 &lcdif {
 	status = "okay";
-	assigned-clock-rates = <445333333>, <148444444>, <400000000>, <133333333>;
+	assigned-clock-rates = <282000000>, <70500000>, <400000000>, <133333333>;
 	max-memory-bandwidth = <221257728>; /* 720x1280-32@60.02 */
 };
 

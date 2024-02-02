@@ -529,18 +529,26 @@ static ssize_t dw_mipi_dsi_host_transfer(struct mipi_dsi_host *host,
 		dev_err(dsi->dev, "failed to create packet: %d\n", ret);
 		return ret;
 	}
+	udelay(50);
 
 	dw_mipi_message_config(dsi, msg);
-	if (dsi->slave)
+	udelay(50);
+	if (dsi->slave){
 		dw_mipi_message_config(dsi->slave, msg);
+		udelay(50);
+	}
 
 	ret = dw_mipi_dsi_write(dsi, &packet);
 	if (ret)
 		return ret;
+
+	udelay(50);
 	if (dsi->slave) {
 		ret = dw_mipi_dsi_write(dsi->slave, &packet);
 		if (ret)
 			return ret;
+
+		udelay(50);
 	}
 
 	if (msg->rx_buf && msg->rx_len) {
@@ -548,6 +556,7 @@ static ssize_t dw_mipi_dsi_host_transfer(struct mipi_dsi_host *host,
 		if (ret)
 			return ret;
 		nb_bytes = msg->rx_len;
+		udelay(50);
 	} else {
 		nb_bytes = packet.size;
 	}
