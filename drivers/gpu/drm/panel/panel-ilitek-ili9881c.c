@@ -1222,7 +1222,7 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 }
 
 static const struct drm_display_mode ph720128t003_default_mode = {
-	.clock		= 70500,
+	.clock		= 66000,
 
 	.hdisplay	= 720,
 	.hsync_start= 720 + 120,
@@ -1239,7 +1239,7 @@ static const struct drm_display_mode ph720128t003_default_mode = {
 };
 
 static const struct drm_display_mode ph720128t005_default_mode = {
-	.clock		= 70500,    // clock = 900 * 1307 * 60.02fps = 70601526
+	.clock		= 66000,
 
 	.hdisplay	= 720,
 	.hsync_start= 720 + 120,
