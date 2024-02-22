@@ -1,0 +1,76 @@
+/*
+ * Copyright 2024 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "../imx93-pinfunc.h"
+
+/* Device tree overlay for MIPI LCD (Old LCD screen) */
+
+&dsi{
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel@0 {
+		compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_backlight>;
+		pwn-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
+		dsi-lanes = <2>;
+		backlight = <&backlight>;
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mipi_dsi_out>;
+			};
+		};
+
+	};
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@1 {
+			reg = <1>;
+			mipi_dsi_out: endpoint {
+			remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&dphy {
+	status = "okay";
+};
+
+&lcdif {
+	status = "okay";
+};
+
+&micfil {
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_gpio_backlight: backlight_grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO06__GPIO2_IO06	0x11e
+		>;
+	};
+};

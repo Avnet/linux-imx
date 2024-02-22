@@ -479,49 +479,19 @@
 };
 
 &dphy {
-	status = "okay";
+	status = "disabled";
 };
 
 &lcdif {
-	status = "okay";
+	status = "disabled";
 	assigned-clock-rates = <264000000>, <66000000>, <400000000>, <133333333>;
 	max-memory-bandwidth = <221257728>; /* 720x1280-32@60.02 */
 };
 
 &dsi{
-	status = "okay";
+	status = "disabled";
 	#address-cells = <1>;
 	#size-cells = <0>;
-
-	panel@0 {
-		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
-		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
-		reg = <0>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_backlight>;
-		pwn-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
-		dsi-lanes = <2>;
-		backlight = <&backlight>;
-
-		port {
-			panel_in: endpoint {
-				remote-endpoint = <&mipi_dsi_out>;
-			};
-		};
-
-	};
-
-	ports {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		port@1 {
-			reg = <1>;
-			mipi_dsi_out: endpoint {
-			remote-endpoint = <&panel_in>;
-			};
-		};
-	};
 };
 
 &micfil {
@@ -531,7 +501,7 @@
 	assigned-clocks = <&clk IMX93_CLK_PDM>;
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <49152000>;
-	status = "okay";
+	status = "disabled";
 };
 
 &usdhc3 {
@@ -713,12 +683,6 @@
 			MX93_PAD_ENET2_TD3__ENET1_RGMII_TD3		0x57e
 			MX93_PAD_ENET2_TXC__ENET1_RGMII_TXC		0x5fe
 			MX93_PAD_ENET2_TX_CTL__ENET1_RGMII_TX_CTL	0x57e
-		>;
-	};
-
-	pinctrl_gpio_backlight: backlight_grp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO06__GPIO2_IO06	0x11e
 		>;
 	};
 
