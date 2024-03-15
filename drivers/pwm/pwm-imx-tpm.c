@@ -23,6 +23,7 @@
 #include <linux/platform_device.h>
 #include <linux/pwm.h>
 #include <linux/slab.h>
+#include <linux/delay.h>
 
 #define PWM_IMX_TPM_PARAM	0x4
 #define PWM_IMX_TPM_GLOBAL	0x8
@@ -252,6 +253,7 @@ static int pwm_imx_tpm_apply_hw(struct pwm_chip *chip,
 	 * disabled.
 	 */
 	val = readl(tpm->base + PWM_IMX_TPM_CnSC(pwm->hwpwm));
+	udelay(50);
 	val &= ~(PWM_IMX_TPM_CnSC_ELS | PWM_IMX_TPM_CnSC_MSA |
 		 PWM_IMX_TPM_CnSC_MSB);
 	if (state->enabled) {
@@ -268,6 +270,7 @@ static int pwm_imx_tpm_apply_hw(struct pwm_chip *chip,
 			PWM_IMX_TPM_CnSC_ELS_INVERSED;
 	}
 	writel(val, tpm->base + PWM_IMX_TPM_CnSC(pwm->hwpwm));
+	udelay(50);
 
 	/* control the counter status */
 	if (state->enabled != c.enabled) {
@@ -280,6 +283,7 @@ static int pwm_imx_tpm_apply_hw(struct pwm_chip *chip,
 				val &= ~PWM_IMX_TPM_SC_CMOD;
 		}
 		writel(val, tpm->base + PWM_IMX_TPM_SC);
+		udelay(50);
 	}
 
 	return 0;
