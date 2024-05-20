@@ -105,6 +105,43 @@
 		regulator-max-microvolt = <5000000>;
 		enable-active-high;
 	};
+
+	leds {
+        compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+        status = "okay";
+
+        led_red {
+                gpios = <&gpio2 12 GPIO_ACTIVE_HIGH>;
+				default-state = "on";
+				linux,default-trigger = "heartbeat";
+
+        };
+
+        led_blue {
+                gpios = <&ioexpander1 1 GPIO_ACTIVE_HIGH>;
+                default-state = "off";
+        };
+
+        led_green {
+                gpios = <&ioexpander1 2 GPIO_ACTIVE_HIGH>;
+                default-state = "off";
+        };
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+
+		UserKeyA {
+			label = "KeyA";
+			gpios = <&ioexpander1 3 GPIO_ACTIVE_LOW>;
+			interrupt-parent = <&ioexpander1>;
+			interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+			linux,code = <KEY_1>;
+		};
+	};
+
 };
 
 &cm33 {
@@ -242,6 +279,32 @@
 	};
 };
 
+&lpi2c5 {
+    #address-cells = <1>;
+    #size-cells = <0>;
+    clock-frequency = <400000>;
+    pinctrl-names = "default", "sleep";
+    pinctrl-0 = <&pinctrl_lpi2c5>;
+    pinctrl-1 = <&pinctrl_lpi2c5>;
+    status = "okay";
+
+    ioexpander1: gpio@20 {
+        compatible = "nxp,pcal6408";
+        reg = <0x20>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_ioexpander1>;
+        interrupt-controller;
+        #interrupt-cells = <2>;
+        interrupt-parent = <&gpio2>;
+        interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
+        gpio-controller;
+        #gpio-cells = <2>;
+        gpio-line-names =
+                "GPIO_A_0", "GPIO_A_1", "GPIO_A_2", "GPIO_A_3",
+                "GPIO_C_4", "GPIO_C_5", "GPIO_C_6", "GPIO_C_7";
+        status = "okay";
+    };
+};
 
 &lpuart1 { /* console */
 	pinctrl-names = "default";
@@ -459,6 +522,24 @@
 	pinctrl_reg_usbotg2: regusbotg2grp {
 		fsl,pins = <
 			MX93_PAD_CCM_CLKO4__GPIO4_IO29			0x51e
+		>;
+	};
+
+	pinctrl_lpi2c5: lpi2c5grp {
+	        fsl,pins = <
+	                MX93_PAD_GPIO_IO23__LPI2C5_SCL                  0x4000091e
+	                MX93_PAD_GPIO_IO22__LPI2C5_SDA                  0x4000091e
+	        >;
+	};
+	pinctrl_ioexpander1: ioexpander1grp {
+	        fsl,pins = <
+	                MX93_PAD_GPIO_IO28__GPIO2_IO28                  0x31e
+	        >;
+	};
+
+	pinctrl_gpio_leds: gpioleds {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO12__GPIO2_IO12		0x51e
 		>;
 	};
 
