@@ -16,6 +16,11 @@
 	model = "Avnet MaaXBoard-Osm93";
 	compatible = "avnet,maaxboard-osm93", "fsl,imx93";
 
+	aliases {
+		rtc0 = &sys_rtc;
+		rtc1 = &bbnsm_rtc;
+	};
+
 	chosen {
 		stdout-path = &lpuart1;
 	};
@@ -191,6 +196,27 @@
 			<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
 	fsl,startup-delay-ms = <500>;
 	status = "okay";
+};
+
+&lpi2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpi2c1>;
+	pinctrl-1 = <&pinctrl_lpi2c1>;
+	status = "okay";
+
+	sys_rtc: rtc@32 {
+		compatible = "microcrystal,rv8803";
+		reg = <0x32>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_rtc>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
+		wakeup-source;
+	};
+
 };
 
 &lpi2c2 {
@@ -729,6 +755,12 @@
 		fsl,pins = <
 			MX93_PAD_GPIO_IO25__CAN2_TX			0x139e
 			MX93_PAD_GPIO_IO27__CAN2_RX			0x139e
+		>;
+	};
+
+	pinctrl_rtc: regrtcgrp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO02__GPIO2_IO02		0x111e
 		>;
 	};
 
