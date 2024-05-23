@@ -376,7 +376,14 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
 			  imx93-11x11-evk-ld.dtb \
 			  imx93-11x11-evk-rpmsg.dtb imx93-11x11-evk-rpmsg-lpv.dtb
 
-dtb-$(CONFIG_ARCH_MXC) += maaxboard-osm93.dtb
+# MaaXBoard serial support
+DTC_FLAGS_maaxboard-osm93 := -@
+
+dtb-$(CONFIG_ARCH_MXC) += \
+	maaxboard-osm93.dtb
+
+subdir-$(CONFIG_ARCH_MXC) += \
+	maaxboard-osm93
 
 imx93-11x11-evk-pmic-pf0900-dtbs := imx93-11x11-evk.dtb imx93-11x11-evk-pmic-pf0900.dtbo
 imx93-11x11-evk-pmic-pf0900-root-dtbs := imx93-11x11-evk-root.dtb imx93-11x11-evk-pmic-pf0900.dtbo
