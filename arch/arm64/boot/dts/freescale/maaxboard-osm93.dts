@@ -185,6 +185,17 @@
 		regulator-max-microvolt = <1800000>;
 	};
 
+	sound-micfil {
+		compatible = "fsl,imx-audio-card";
+		model = "micfil-audio";
+		pri-dai-link {
+			link-name = "micfil hifi";
+			format = "i2s";
+			cpu {
+				sound-dai = <&micfil>;
+			};
+		};
+	};
 };
 
 &cm33 {
@@ -571,6 +582,16 @@
 	};
 };
 
+&micfil {
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pdm>;
+	assigned-clocks = <&clk IMX93_CLK_PDM>;
+	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
+	assigned-clock-rates = <49152000>;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
@@ -795,6 +816,13 @@
 			MX93_PAD_GPIO_IO19__LPSPI4_SIN		0x3fe
 			MX93_PAD_GPIO_IO20__LPSPI4_SOUT		0x3fe
 			MX93_PAD_GPIO_IO21__LPSPI4_SCK		0x3fe
+		>;
+	};
+
+	pinctrl_pdm: pdmgrp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO04__PDM_CLK             0x31e
+			MX93_PAD_GPIO_IO05__PDM_BIT_STREAM00	0x31e
 		>;
 	};
 
