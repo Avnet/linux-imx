@@ -234,6 +234,43 @@
 		status = "okay";
 	};
 
+	/* touch screen for avnet,ph720128t005 */
+	gt911: gt911_ts@14 {
+		compatible = "goodix,gt911";
+		reg = <0x14>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+		irq-gpios = <&gpio2 29 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		edge-failling-trigger;
+		status = "disabled";
+	};
+
+	/* touch screen for avnet,ph720128t003 */
+	ft5426: ft5426_ts@38 {
+		compatible = "focaltech,fts";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+		focaltech,reset-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		focaltech,irq-gpio = <&gpio2 29 GPIO_ACTIVE_HIGH>;
+		focaltech,max-touch-number = <10>;
+		focaltech,panel-type = <0x54260002>; /* _FT5426 */
+		focaltech,display-coords =	<0 0 720 1280>;
+		focaltech,have-key;
+		focaltech,key-number = <3>;
+		focaltech,keys = <139 102 158>;
+		focaltech,key-y-coord = <2000>;
+		focaltech,key-x-coords = <200 600 800>;
+		status = "okay";
+	};
+
 };
 
 &lpi2c2 {
@@ -477,8 +514,8 @@
 	#size-cells = <0>;
 
 	panel@0 {
-		compatible = "avnet,ph720128t005", "ilitek,ili9881c";
-		//compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		//compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+		compatible = "avnet,ph720128t003", "ilitek,ili9881c";
 		reg = <0>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_mipi_dsi_en>;

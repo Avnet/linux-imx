@@ -1414,3 +1414,4 @@ config TOUCHSCREEN_HIMAX_HX83112B
 endif
 
 source "drivers/input/touchscreen/synaptics_dsx/Kconfig"
+source "drivers/input/touchscreen/focaltech_touch/Kconfig"
