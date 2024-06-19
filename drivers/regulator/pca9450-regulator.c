@@ -985,6 +985,7 @@ static int pca9450_i2c_probe(struct i2c_client *i2c)
 		pca9450->rcnt = ARRAY_SIZE(pca9450bc_regulators);
 		break;
 	case PCA9450_TYPE_PCA9451A:
+	case PCA9450_TYPE_PCA9451B:
 	case PCA9450_TYPE_PCA9452:
 		regulator_desc = pca9451a_regulators;
 		pca9450->rcnt = ARRAY_SIZE(pca9451a_regulators);
@@ -1010,6 +1011,7 @@ static int pca9450_i2c_probe(struct i2c_client *i2c)
 	if (((device_id >> 4) != 0x1 && type == PCA9450_TYPE_PCA9450A) ||
 	    ((device_id >> 4) != 0x3 && type == PCA9450_TYPE_PCA9450BC) ||
 	    ((device_id >> 4) != 0x9 && type == PCA9450_TYPE_PCA9451A) ||
+		((device_id >> 4) != 0x9 && type == PCA9450_TYPE_PCA9451B) ||
 	    ((device_id >> 4) != 0x9 && type == PCA9450_TYPE_PCA9452)) {
 		dev_err(&i2c->dev, "Device id(%x) mismatched\n",
 			device_id >> 4);
@@ -1021,11 +1023,11 @@ static int pca9450_i2c_probe(struct i2c_client *i2c)
 		struct regulator_dev *rdev;
 		const struct pca9450_regulator_desc *r;
 
-		if ((type == PCA9450_TYPE_PCA9451A || type == PCA9450_TYPE_PCA9452) &&
+		if ((type == PCA9450_TYPE_PCA9451A || type == PCA9450_TYPE_PCA9451B || type == PCA9450_TYPE_PCA9452) &&
 		    !strcmp((&regulator_desc[i])->desc.name, "buck1") && pmic_trim) {
 			r = &regulator_desc[i + 1];
 			i = i + 1;
-		} else if ((type == PCA9450_TYPE_PCA9451A || type == PCA9450_TYPE_PCA9452) &&
+		} else if ((type == PCA9450_TYPE_PCA9451A || type == PCA9450_TYPE_PCA9451B || type == PCA9450_TYPE_PCA9452) &&
 			   !strcmp((&regulator_desc[i])->desc.name, "buck1")) {
 			r = &regulator_desc[i];
 			i = i + 1;
@@ -1115,7 +1117,9 @@ static int pca9450_i2c_probe(struct i2c_client *i2c)
 
 	dev_info(&i2c->dev, "%s probed.\n",
 		type == PCA9450_TYPE_PCA9450A ? "pca9450a" :
-		(type == PCA9450_TYPE_PCA9451A ? "pca9451a" : "pca9450bc"));
+		(type == PCA9450_TYPE_PCA9451A ? "pca9451a" :
+		(type == PCA9450_TYPE_PCA9451B ? "pca9451b" : "pca9450bc")));
+
 
 	return 0;
 }
@@ -1136,6 +1140,10 @@ static const struct of_device_id pca9450_of_match[] = {
 	{
 		.compatible = "nxp,pca9451a",
 		.data = (void *)PCA9450_TYPE_PCA9451A,
+	},
+	{
+		.compatible = "nxp,pca9451b",
+		.data = (void *)PCA9450_TYPE_PCA9451B,
 	},
 	{
 		.compatible = "nxp,pca9452",
