@@ -117,11 +117,6 @@
 		pinctrl-0 = <&pinctrl_gpio_leds>;
         status = "okay";
 
-		M2_EN {
-                gpios = <&ioexpander1 0 GPIO_ACTIVE_HIGH>;     /* WiFi/Bluetooth module power pin */
-                default-state = "on";
-        };
-
         led_red {
                 gpios = <&gpio2 12 GPIO_ACTIVE_HIGH>;
 				default-state = "on";
@@ -621,6 +616,7 @@
 	non-removable;
 	wakeup-source;
 	fsl,sdio-async-interrupt-enabled;
+	M2Enable-gpios = <&ioexpander1 0 GPIO_ACTIVE_HIGH>;     /* WiFi/Bluetooth module power pin */
 	status = "okay";
 
 	wifi_wake_host {

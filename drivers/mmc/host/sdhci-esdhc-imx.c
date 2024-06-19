@@ -26,6 +26,7 @@
 #include <linux/platform_device.h>
 #include <linux/pinctrl/consumer.h>
 #include <linux/pm_runtime.h>
+#include <linux/gpio/consumer.h>
 #include "sdhci-cqhci.h"
 #include "sdhci-pltfm.h"
 #include "sdhci-esdhc.h"
@@ -1761,7 +1762,18 @@ sdhci_esdhc_imx_probe_dt(struct platform_device *pdev,
 {
 	struct device_node *np = pdev->dev.of_node;
 	struct esdhc_platform_data *boarddata = &imx_data->boarddata;
+	struct gpio_desc *M2_module_enable_gpiod;
 	int ret;
+
+	/* Get the M2_module_enable GPIO pin number */
+	M2_module_enable_gpiod = devm_gpiod_get(&pdev->dev, "M2Enable", 0);
+	if (!IS_ERR(M2_module_enable_gpiod))
+	{
+		if(0 == gpiod_direction_output(M2_module_enable_gpiod, 1))
+		{
+			printk("[%s,%d], Set M2_module_enable GPIO pins to high level.\n", __FUNCTION__, __LINE__);
+		}
+	}
 
 	if (of_property_read_bool(np, "fsl,wp-controller"))
 		boarddata->wp_type = ESDHC_WP_CONTROLLER;
