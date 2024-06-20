@@ -271,7 +271,7 @@
 		focaltech,keys = <139 102 158>;
 		focaltech,key-y-coord = <2000>;
 		focaltech,key-x-coords = <200 600 800>;
-		status = "okay";
+		status = "disabled";
 	};
 
 };
@@ -547,49 +547,19 @@
 };
 
 &dphy {
-	status = "okay";
+	status = "disabled";
 };
 
 &lcdif {
-	status = "okay";
+	status = "disabled";
 	assigned-clock-rates = <282000000>, <70500000>,  <400000000>, <133333333>;
 	max-memory-bandwidth = <221257728>; /* 720x1280-32@60.02 */
 };
 
 &dsi{
-	status = "okay";
+	status = "disabled";
 	#address-cells = <1>;
 	#size-cells = <0>;
-
-	panel@0 {
-		//compatible = "avnet,ph720128t005", "ilitek,ili9881c";
-		compatible = "avnet,ph720128t003", "ilitek,ili9881c";
-		reg = <0>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
-		pwn-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;
-		dsi-lanes = <2>;
-		backlight = <&backlight>;
-
-		port {
-			panel_in: endpoint {
-				remote-endpoint = <&mipi_dsi_out>;
-			};
-		};
-
-	};
-
-	ports {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		port@1 {
-			reg = <1>;
-			mipi_dsi_out: endpoint {
-			remote-endpoint = <&panel_in>;
-			};
-		};
-	};
 };
 
 &tpm5 {
@@ -823,12 +793,6 @@
 	pinctrl_gpio_leds: gpioleds {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO12__GPIO2_IO12		0x51e
-		>;
-	};
-
-	pinctrl_mipi_dsi_en: mipi_dsi_en {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO24__GPIO2_IO24      0x11e  /* DSI_EN */
 		>;
 	};
 
