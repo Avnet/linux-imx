@@ -147,6 +147,8 @@
 		};
 	};
 
+
+
 	backlight: pwm-backlight {
 	        compatible = "pwm-backlight";
 	        pwms = <&tpm5 0 40000 0>;
@@ -381,34 +383,31 @@
     status = "okay";
 
     ioexpander1: gpio@20 {
-		#gpio-cells = <2>;
+		compatible = "nxp,pcal6408";
+		reg = <0x20>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ioexpander_1>;
-		compatible = "ti,tca6408";
-		reg = <0x20>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <28 IRQ_TYPE_EDGE_RISING>;
 		interrupt-controller;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
 		gpio-controller;
+		#gpio-cells = <2>;
 		gpio-line-names =
 				"GPIO_A_0", "GPIO_A_1", "GPIO_A_2", "GPIO_A_3",
 				"GPIO_C_4", "GPIO_C_5", "GPIO_C_6", "GPIO_C_7";
-		vcc-supply = <&reg_vcc_1v8>;
 		status = "okay";
 	};
 
 	ioexpander2: gpio@21 {
-		#gpio-cells = <2>;
-		pinctrl-names = "default";
-		// pinctrl-0 = <&pinctrl_ioexpander_2>;
-		compatible = "ti,tca6408";
-		reg = <0x21>;
-		gpio-controller;
-		gpio-line-names =
-				"GPIO_B_0", "GPIO_B_1", "GPIO_B_2", "GPIO_B_3",
-				"GPIO_B_4", "GPIO_B_5", "GPIO_B_6", "GPIO_B_7";
-		vcc-supply = <&reg_vcc_1v8>;
-		status = "okay";
+		compatible = "nxp,pcal6408";
+        reg = <0x21>;
+        gpio-controller;
+        #gpio-cells = <2>;
+        gpio-line-names =
+                "GPIO_B_0", "GPIO_B_1", "GPIO_B_2", "GPIO_B_3",
+                "GPIO_B_4", "GPIO_B_5", "GPIO_B_6", "GPIO_B_7";
+        status = "okay";
 	};
 
 	ov5640_mipi: ov5640_mipi@3c {
