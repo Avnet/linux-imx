@@ -121,7 +121,6 @@
                 gpios = <&gpio2 12 GPIO_ACTIVE_HIGH>;
 				default-state = "on";
 				linux,default-trigger = "heartbeat";
-
         };
 
         led_blue {
@@ -146,8 +145,6 @@
 			linux,code = <KEY_1>;
 		};
 	};
-
-
 
 	backlight: pwm-backlight {
 	        compatible = "pwm-backlight";
@@ -283,7 +280,6 @@
 		focaltech,key-x-coords = <200 600 800>;
 		status = "disabled";
 	};
-
 };
 
 &lpi2c2 {
@@ -596,7 +592,6 @@
 		interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
 		interrupt-names = "host-wake";
 	};
-
 };
 
 &lpuart3 {
@@ -876,5 +871,4 @@
 			MX93_PAD_GPIO_IO13__GPIO2_IO13			0x111e
 		>;
 	};
-
 };
