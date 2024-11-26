@@ -19,6 +19,13 @@
 		#clock-cells = <0>;
 	};
 
+	da7212_mclk: da7212-mclk {
+		compatible = "fixed-clock";
+		clock-frequency = <12288000>;
+		clock-output-names = "da7212_mclk";
+		#clock-cells = <0>;
+	};
+
 	cm33: remoteproc-cm33 {
 		compatible = "fsl,imx8ulp-cm33";
 		status = "disabled";
