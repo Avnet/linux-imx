@@ -184,8 +184,10 @@ static int check_state(struct v4l2_subdev *sd, struct v4l2_subdev_state *state,
 #endif
 	}
 
+#if 0 /* Comment out the following check to fix the bug where user-space camera is not working. */
 	if (stream != 0)
 		return -EINVAL;
+#endif
 
 	if (which == V4L2_SUBDEV_FORMAT_TRY && (!state || !state->pads))
 		return -EINVAL;
