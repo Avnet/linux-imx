@@ -4,6 +4,8 @@
 DTC_FLAGS += -@
 
 dtb-y += camera-ov5640.dtbo
+dtb-y += display-mipi.dtbo
+dtb-y += display-mipi-ph720128t003.dtbo
 dtb-y += ext-gpio.dtbo
 dtb-y += ext-i2c4.dtbo
 dtb-y += ext-spi5.dtbo

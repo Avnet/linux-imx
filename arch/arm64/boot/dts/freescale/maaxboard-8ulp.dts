@@ -208,6 +208,15 @@
 
 		status = "okay";
 	};
+
+	backlight: pwm-backlight {
+		compatible = "pwm-backlight";
+		pwms = <&tpm_rpchip_3 5 50000 0>;
+		brightness-levels = <0 8 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <8>;
+		enable-pwm-on;
+		status = "disabled";
+	};
 };
 
 /*+--------------------+
@@ -357,6 +366,56 @@
 	status = "okay";
 };
 
+/*+---------------------+
+  | MIPI-DSI LCD Module |
+  +---------------------+*/
+
+&dcnano {
+	status = "disabled";
+};
+
+&dphy {
+	status = "disabled";
+};
+
+&dsi {
+	status = "disabled";
+};
+
+&i2c_rpbus_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "disabled";
+
+	/* touch screen for avnet,ph720128t005 */
+	gt911: gt911_ts@14 {
+		compatible = "goodix,gt911";
+		reg = <0x14>;
+		interrupt-parent = <&rpmsg_gpioa>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&rpmsg_gpioa 5 GPIO_ACTIVE_HIGH>;
+		irq-gpios = <&rpmsg_gpioa 19 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		edge-failling-trigger;
+		status = "disabled";
+	};
+
+	/* touch screen for avnet,ph720128t003 */
+	ft5426: ft5426_ts@38 {
+		compatible = "focaltech,fts";
+		reg = <0x38>;
+		interrupt-parent = <&rpmsg_gpioa>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpio = <&rpmsg_gpioa 5 GPIO_ACTIVE_LOW>;
+		irq-gpio = <&rpmsg_gpioa 19 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		max-touch-number = <10>;
+		status = "disabled";
+	};
+};
+
 /*+-------------------------+
   |   Audio/Camera Module   |
   +-------------------------+*/
@@ -433,15 +492,15 @@
 
 	pinctrl_enet: enetgrp {
 		fsl,pins = <
-			MX8ULP_PAD_PTE15__ENET0_MDC		0x43
-			MX8ULP_PAD_PTE14__ENET0_MDIO	0x43
-			MX8ULP_PAD_PTE17__ENET0_RXER	0x43
+			MX8ULP_PAD_PTE15__ENET0_MDC		0x7
+			MX8ULP_PAD_PTE14__ENET0_MDIO	0x7
+			MX8ULP_PAD_PTE17__ENET0_RXER	0x7
 			MX8ULP_PAD_PTE18__ENET0_CRS_DV	0x43
 			MX8ULP_PAD_PTE21__ENET0_RXD0	0x43
 			MX8ULP_PAD_PTE20__ENET0_RXD1	0x43
-			MX8ULP_PAD_PTE16__ENET0_TXEN	0x43
-			MX8ULP_PAD_PTE23__ENET0_TXD0	0x43
-			MX8ULP_PAD_PTE22__ENET0_TXD1	0x43
+			MX8ULP_PAD_PTE16__ENET0_TXEN	0x7
+			MX8ULP_PAD_PTE23__ENET0_TXD0	0x7
+			MX8ULP_PAD_PTE22__ENET0_TXD1	0x7
 			MX8ULP_PAD_PTE19__ENET0_REFCLK	0x43
 		>;
 	};

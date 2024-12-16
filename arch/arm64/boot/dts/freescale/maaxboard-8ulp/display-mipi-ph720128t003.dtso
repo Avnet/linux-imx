@@ -1,0 +1,95 @@
+/*
+ * Copyright 2022 AVNET
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/display/drm_mipi_dsi.h>
+
+/* Device tree overlay for MIPI LCD (Old LCD screen-ver0.1) */
+
+&dcnano {
+	status = "okay";
+};
+
+&dphy {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel@0 {
+		compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+		reg = <0>;
+		pwn-gpios = <&rpmsg_gpioa 6 GPIO_ACTIVE_HIGH>;
+		backlight = <&backlight>;
+
+		dsi-lanes = <2>;
+		dsi-flags = <(MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_SYNC_PULSE |
+				MIPI_DSI_MODE_VIDEO_NO_HFP | MIPI_DSI_MODE_VIDEO_NO_HBP | MIPI_DSI_MODE_VIDEO_NO_HSA)>;
+
+		height-mm = <153>;
+		width-mm = <50>;
+		panel-timing {
+			clock-frequency = <66000000>;
+			hactive = <720>;
+			hfront-porch = <120>;
+			hsync-len = <40>;
+			hback-porch = <20>;
+			vactive = <1280>;
+			vfront-porch = <10>;
+			vsync-len = <2>;
+			vback-porch = <15>;
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <1>;
+			pixelclk-active = <1>;
+		};
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mipi_dsi_out>;
+			};
+		};
+	};
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@1 {
+			reg = <1>;
+
+			mipi_dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&backlight{
+	status = "okay";
+};
+
+&i2c_rpbus_0 {
+	status = "okay";
+};
+
+/* For Avnet PH720128T003 LCD display touchscreen */
+&ft5426{
+	status = "okay";
+};
