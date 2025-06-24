@@ -162,6 +162,53 @@
     status = "okay";
 };
 
+&lpi2c1 {
+    #address-cells = <1>;
+    #size-cells = <0>;
+    clock-frequency = <400000>;
+    pinctrl-names = "default", "sleep";
+    pinctrl-0 = <&pinctrl_lpi2c1>;
+    pinctrl-1 = <&pinctrl_lpi2c1>;
+    status = "okay";
+
+    /* touch screen for avnet,ph720128t005 */
+    gt911: gt911_ts@14 {
+        compatible = "goodix,gt911";
+        reg = <0x14>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_ts>;
+        interrupt-parent = <&gpio2>;
+        interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+        irq-gpios = <&gpio2 29 GPIO_ACTIVE_HIGH>;
+        reset-gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+        touchscreen-size-x = <720>;
+        touchscreen-size-y = <1280>;
+        edge-failling-trigger;
+        status = "disabled";
+    };
+
+    /* touch screen for avnet,ph720128t003 */
+    ft5426: ft5426_ts@38 {
+        compatible = "focaltech,fts";
+        reg = <0x38>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_ts>;
+        interrupt-parent = <&gpio2>;
+        interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+        focaltech,reset-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+        focaltech,irq-gpio = <&gpio2 29 GPIO_ACTIVE_HIGH>;
+        focaltech,max-touch-number = <10>;
+        focaltech,panel-type = <0x54260002>; /* _FT5426 */
+        focaltech,display-coords =    <0 0 720 1280>;
+        focaltech,have-key;
+        focaltech,key-number = <3>;
+        focaltech,keys = <139 102 158>;
+        focaltech,key-y-coord = <2000>;
+        focaltech,key-x-coords = <200 600 800>;
+        status = "okay";
+    };
+};
+
 &lpi2c2 {
     #address-cells = <1>;
     #size-cells = <0>;
@@ -389,8 +436,8 @@
     #size-cells = <0>;
 
     panel@0 {
-        compatible = "avnet,ph720128t005", "ilitek,ili9881c";
-        #compatible = "avnet,ph720128t003", "ilitek,ili9881c";
+        #compatible = "avnet,ph720128t005", "ilitek,ili9881c";
+        compatible = "avnet,ph720128t003", "ilitek,ili9881c";
         reg = <0>;
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_mipi_dsi_en>;
@@ -423,9 +470,9 @@
 };
 
 &lcdif {
-	status = "okay";
-	assigned-clock-rates = <282000000>, <70500000>,  <400000000>, <133333333>;
-	max-memory-bandwidth = <221257728>; /* 720x1280-32@60.02 */
+    status = "okay";
+    assigned-clock-rates = <282000000>, <70500000>,  <400000000>, <133333333>;
+    max-memory-bandwidth = <221257728>; /* 720x1280-32@60.02 */
 };
 
 &tpm5 {
@@ -590,6 +637,20 @@
     pinctrl_pwm5: pwm5_grp {
         fsl,pins = <
             MX93_PAD_GPIO_IO06__TPM5_CH0        0x11e
+        >;
+    };
+
+    pinctrl_lpi2c1: lpi2c1grp {
+        fsl,pins = <
+            MX93_PAD_I2C1_SCL__LPI2C1_SCL            0x40000b9e
+            MX93_PAD_I2C1_SDA__LPI2C1_SDA            0x40000b9e
+        >;
+    };
+
+    pinctrl_ts: ts_pinsgrp {
+        fsl,pins = <
+            MX93_PAD_PDM_BIT_STREAM1__GPIO1_IO10       0x31e  /* DSI_TS_RST  */
+            MX93_PAD_GPIO_IO29__GPIO2_IO29             0x31e
         >;
     };
 };
