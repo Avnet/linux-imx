@@ -180,6 +180,12 @@
         regulator-min-microvolt = <1800000>;
         regulator-max-microvolt = <1800000>;
     };
+
+    /* wifi & bluetooth */
+    usdhc3_pwrseq: usdhc3_pwrseq {
+        compatible = "mmc-pwrseq-simple";
+        reset-gpios = <&ioexpander1 4 GPIO_ACTIVE_LOW>;
+    };
 };
 
 &cm33 {
@@ -368,6 +374,17 @@
         gpio-line-names =
                 "GPIO_A_0", "GPIO_A_1", "GPIO_A_2", "GPIO_A_3",
                 "GPIO_C_4", "GPIO_C_5", "GPIO_C_6", "GPIO_C_7";
+        status = "okay";
+    };
+
+    ioexpander2: gpio@21 {
+        compatible = "nxp,pcal6408";
+        reg = <0x21>;
+        gpio-controller;
+        #gpio-cells = <2>;
+        gpio-line-names =
+                "GPIO_B_0", "GPIO_B_1", "GPIO_B_2", "GPIO_B_3",
+                "GPIO_B_4", "GPIO_B_5", "GPIO_B_6", "GPIO_B_7";
         status = "okay";
     };
 
@@ -602,6 +619,37 @@
     status = "okay";
 };
 
+&usdhc3 {
+    pinctrl-names = "default", "state_100mhz", "state_200mhz";
+    pinctrl-0 = <&pinctrl_usdhc3>;
+    pinctrl-1 = <&pinctrl_usdhc3>;
+    pinctrl-2 = <&pinctrl_usdhc3>;
+    mmc-pwrseq = <&usdhc3_pwrseq>;
+    max-frequency = <100000000>;
+    bus-width = <4>;
+    keep-power-in-suspend;
+    non-removable;
+    wakeup-source;
+    fsl,sdio-async-interrupt-enabled;
+    M2Enable-gpios = <&ioexpander1 0 GPIO_ACTIVE_HIGH>;     /* WiFi/Bluetooth module power pin */
+    status = "okay";
+
+    wifi_wake_host {
+        compatible = "nxp,wifi-wake-host";
+        interrupt-parent = <&ioexpander2>;
+        interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
+        interrupt-names = "host-wake";
+    };
+};
+
+&lpuart3 {
+    /* BlueTooth */
+    pinctrl-names = "default", "sleep";
+    pinctrl-0 = <&pinctrl_lpuart3>;
+    pinctrl-1 = <&pinctrl_lpuart3>;
+    status = "okay";
+};
+
 &iomuxc {
     pinctrl_lpi2c1: lpi2c1grp {
         fsl,pins = <
@@ -798,6 +846,26 @@
     pinctrl_rtc: regrtcgrp {
         fsl,pins = <
             MX93_PAD_GPIO_IO02__GPIO2_IO02        0x111e
+        >;
+    };
+
+    pinctrl_usdhc3: usdhc3grp {
+        fsl,pins = <
+            MX93_PAD_SD3_CLK__USDHC3_CLK        0x15fe
+            MX93_PAD_SD3_CMD__USDHC3_CMD        0x13fe
+            MX93_PAD_SD3_DATA0__USDHC3_DATA0    0x13fe
+            MX93_PAD_SD3_DATA1__USDHC3_DATA1    0x13fe
+            MX93_PAD_SD3_DATA2__USDHC3_DATA2    0x13fe
+            MX93_PAD_SD3_DATA3__USDHC3_DATA3    0x13fe
+        >;
+    };
+
+    pinctrl_lpuart3: uart3grp {
+        fsl,pins = <
+            MX93_PAD_GPIO_IO14__LPUART3_TX        0x31e
+            MX93_PAD_GPIO_IO15__LPUART3_RX        0x31e
+            MX93_PAD_GPIO_IO16__LPUART3_CTS_B    0x31e
+            MX93_PAD_GPIO_IO17__LPUART3_RTS_B    0x31e
         >;
     };
 };
