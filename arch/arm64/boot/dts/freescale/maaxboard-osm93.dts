@@ -528,17 +528,21 @@
 };
 
 &isi {
-    status = "okay";
+    status = "disabled";
 
     port {
         isi_in: endpoint {
             remote-endpoint = <&mipi_csi_out>;
         };
     };
+
+    cap_device {
+		status = "disabled";
+	};
 };
 
 &mipi_csi {
-    status = "okay";
+    status = "disabled";
 
     ports {
         #address-cells = <1>;
@@ -565,10 +569,6 @@
             };
         };
     };
-};
-
-&dphy_rx {
-    status = "okay";
 };
 
 &flexcan1 {
