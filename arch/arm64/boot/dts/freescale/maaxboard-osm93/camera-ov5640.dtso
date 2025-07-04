@@ -37,6 +37,10 @@
 	status = "okay";
 };
 
+&dphy {
+    status = "okay";
+};
+
 &dphy_rx {
     status = "okay";
 };
