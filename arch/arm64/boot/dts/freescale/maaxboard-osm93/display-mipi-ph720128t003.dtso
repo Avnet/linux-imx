@@ -70,3 +70,13 @@
 		>;
 	};
 };
+
+/* For Avnet PH720128T003 LCD display touchscreen */
+&ft5426{
+	status = "okay";
+};
+
+/* For Avnet PH720128T005 LCD display touchscreen */
+&gt911{
+	status = "disabled";
+};

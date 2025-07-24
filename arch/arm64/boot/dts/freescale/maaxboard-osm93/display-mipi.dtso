@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 AVNET
+ * Copyright 2025 AVNET
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -69,4 +69,14 @@
 			MX93_PAD_GPIO_IO24__GPIO2_IO24      0x11e  /* DSI_EN */
 		>;
 	};
+};
+
+/* For Avnet PH720128T003 LCD display touchscreen */
+&ft5426{
+	status = "disabled";
+};
+
+/* For Avnet PH720128T005 LCD display touchscreen */
+&gt911{
+	status = "okay";
 };
