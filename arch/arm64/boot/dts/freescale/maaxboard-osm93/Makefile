@@ -6,4 +6,5 @@ DTC_FLAGS += -@
 dtb-y += ext-gpio.dtbo
 dtb-y += ext-i2c2.dtbo
 dtb-y += ext-spi1.dtbo
-
+dtb-y += display-mipi-ph720128t003.dtbo
+dtb-y += display-mipi.dtbo
