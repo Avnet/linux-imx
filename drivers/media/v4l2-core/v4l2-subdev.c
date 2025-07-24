@@ -184,8 +184,10 @@ static int check_state(struct v4l2_subdev *sd, struct v4l2_subdev_state *state,
 #endif
 	}
 
+#if 0  /* userspace may not set the value of 'stream' to '0', This will cause the camera to not work properly */
 	if (stream != 0)
 		return -EINVAL;
+#endif
 
 	if (which == V4L2_SUBDEV_FORMAT_TRY && (!state || !state->pads))
 		return -EINVAL;
