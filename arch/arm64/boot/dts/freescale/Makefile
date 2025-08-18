@@ -392,7 +392,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
 DTC_FLAGS_maaxboard-osm93 := -@
 
 dtb-$(CONFIG_ARCH_MXC) += \
-	          maaxboard-osm93.dtb
+	          maaxboard-osm93.dtb \
+			  maaxboard-8ulp.dtb
 
 subdir-$(CONFIG_ARCH_MXC) += \
 	          maaxboard-osm93
