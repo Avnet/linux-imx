@@ -135,6 +135,47 @@
 		regulator-max-microvolt = <5000000>;
 		regulator-always-on;
 	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		status = "okay";
+
+		ledred {
+			gpios = <&gpiof 29 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		ledgreen {
+			gpios = <&gpiof 20 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		ledblue {
+			gpios = <&gpioe 6 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+			default-state = "on";
+		};
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_keys>;
+
+		UserKeyA {
+			label = "KeyA";
+			gpios = <&gpiof 7 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_1>;
+		};
+
+		UserKeyB {
+			label = "KeyB";
+			gpios = <&gpiof 30 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_2>;
+		};
+	};
 };
 
 /*+--------------------+
@@ -312,6 +353,21 @@
 			MX8ULP_PAD_PTD4__SDHC0_D6	0x3
 			MX8ULP_PAD_PTD3__SDHC0_D7	0x3
 			MX8ULP_PAD_PTD11__SDHC0_DQS 0x10002
+		>;
+	};
+
+	pinctrl_gpio_leds: gpioleds {
+		fsl,pins = <
+			MX8ULP_PAD_PTF20__PTF20		0x3
+			MX8ULP_PAD_PTF29__PTF29		0x3
+			MX8ULP_PAD_PTE6__PTE6		0x3
+		>;
+	};
+
+	pinctrl_gpio_keys: gpiokeys {
+		fsl,pins = <
+			MX8ULP_PAD_PTF30__PTF30		0x3
+			MX8ULP_PAD_PTF7__PTF7		0x3
 		>;
 	};
 };
