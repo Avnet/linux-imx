@@ -390,13 +390,15 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
 
 # MaaXBoard serial support
 DTC_FLAGS_maaxboard-osm93 := -@
+DTC_FLAGS_maaxboard-8ulp := -@
 
 dtb-$(CONFIG_ARCH_MXC) += \
 	          maaxboard-osm93.dtb \
 			  maaxboard-8ulp.dtb
 
 subdir-$(CONFIG_ARCH_MXC) += \
-	          maaxboard-osm93
+	          maaxboard-osm93 \
+			  maaxboard-8ulp
 
 dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
 			  imx91-11x11-evk-flexspi-m2.dtb imx91-11x11-evk-flexspi-nand-m2.dtb \
