@@ -41,7 +41,7 @@ struct ili9881c_instr {
 struct ili9881c_desc {
 	const struct ili9881c_instr *init;
 	const size_t init_length;
-	const struct drm_display_mode *mode;
+	struct drm_display_mode *mode;
 	const unsigned long mode_flags;
 	const char  *name;
 };
@@ -49,7 +49,7 @@ struct ili9881c_desc {
 struct ili9881c {
 	struct drm_panel	panel;
 	struct mipi_dsi_device	*dsi;
-	const struct ili9881c_desc	*desc;
+	struct ili9881c_desc	*desc;
 
 	struct gpio_desc	*power;
 	struct gpio_desc	*reset;
@@ -1389,7 +1389,10 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 	return 0;
 }
 
-static const struct drm_display_mode ph720128t003_default_mode = {
+/* Sentinel mode for panel timing parser from device tree */
+static struct drm_display_mode dt_sentinel_mode;
+
+static struct drm_display_mode ph720128t003_default_mode = {
 	.clock		= 70601, /* htotal*vtotal*fps = 900x1307x60.02= 70,601,526 */
 
 	.hdisplay	= 720,
@@ -1406,7 +1409,7 @@ static const struct drm_display_mode ph720128t003_default_mode = {
 	.height_mm	= 90,
 };
 
-static const struct drm_display_mode ph720128t005_default_mode = {
+static struct drm_display_mode ph720128t005_default_mode = {
 	.clock		= 70601, /* htotal*vtotal*fps = 900x1307x60.02= 70,601,526 */
 
 	.hdisplay	= 720,
@@ -1518,8 +1521,9 @@ static int ili9881c_get_modes(struct drm_panel *panel,
 	 * TODO: Remove once all drm drivers call
 	 * drm_connector_set_orientation_from_panel()
 	 */
-	drm_connector_set_panel_orientation(connector, ctx->orientation);
-
+	 #if 0 /* Don't support it on MaaXBoard-Mini */
+	 drm_connector_set_panel_orientation(connector, ctx->orientation);
+     #endif
 	return 1;
 }
 
@@ -1578,6 +1582,25 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 		dsi->lanes = 2;
 	}
 
+	/* MaaXBoard-8ULP must set: MIPI_DSI_MODE_VIDEO_NO_HFP|MIPI_DSI_MODE_VIDEO_NO_HBP|MIPI_DSI_MODE_VIDEO_NO_HSA
+	 * Reference: nwl_dsi_config_dpi() in drivers/gpu/drm/bridge/nwl-dsi.c
+	 *
+	 * MaaXBoard-Mini can't set: MIPI_DSI_MODE_VIDEO|MIPI_DSI_MODE_VIDEO_BURST|MIPI_DSI_MODE_VIDEO_SYNC_PULSE
+	 * Reference: sec_mipi_dsim_host_attach() in drivers/gpu/drm/bridge/sec-dsim.c:441
+	 */
+	 ret = of_property_read_u32(dsi->dev.of_node, "dsi-flags", (u32 *)&dsi->mode_flags);
+	 if (ret < 0) {
+		 dev_dbg(&dsi->dev, "Failed to get dsi-flags property, use default setting\n");
+		 dsi->mode_flags = ctx->desc->mode_flags;
+	 }
+
+	 /* parser panel timing from device tree if it exist, or use default mode */
+	 ret = of_get_drm_panel_display_mode(dsi->dev.of_node, &dt_sentinel_mode, NULL);
+	 if (ret == 0) {
+		 dev_info(&dsi->dev, "OF: parsing panel-timing from device tree\n");
+		 ctx->desc->mode = &dt_sentinel_mode;
+	 }
+
 	ret = of_drm_get_panel_orientation(dsi->dev.of_node, &ctx->orientation);
 	if (ret) {
 		dev_err(&dsi->dev, "%pOF: failed to get orientation: %d\n",
@@ -1591,7 +1614,6 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 
 	drm_panel_add(&ctx->panel);
 
-	dsi->mode_flags = ctx->desc->mode_flags;
 	dsi->format = MIPI_DSI_FMT_RGB888;
 
 	return mipi_dsi_attach(dsi);

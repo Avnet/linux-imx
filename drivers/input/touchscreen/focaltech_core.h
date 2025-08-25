@@ -123,7 +123,8 @@
 #define FTS_HID_SUPPORTTED		((FTS_CHIP_TYPE & FLAGBIT(FLAG_HID_BIT))  \
 								== FLAGBIT(FLAG_HID_BIT))
 #define FTS_MAX_CHIP_IDS		8
-#define FTS_CHIP_TYPE_MAPPING	{{0x81, 0x54, 0x52, 0x54, 0x52, 0x00, 0x00, 0x54, 0x5C}}
+/* It's FT5422 on panel avnet,ph720128t003 */
+#define FTS_CHIP_TYPE_MAPPING	{{0x81, 0x54, 0x22, 0x54, 0x52, 0x00, 0x00, 0x54, 0x5C}}
 #define ENABLE								1
 #define DISABLE								0
 #define VALID								1

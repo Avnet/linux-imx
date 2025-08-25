@@ -601,7 +601,8 @@ static int fts_irq_registration(struct fts_ts_data *ts_data)
 	int ret = 0;
 	struct fts_ts_platform_data *pdata = ts_data->pdata;
 
-	ts_data->irq = gpio_to_irq(pdata->irq_gpio);
+	/* MaaXBoard-8ULP can't use gpio_to_irq() for the IRQ pin is on M-Core */
+	ts_data->irq = ts_data->client->irq;
 	pdata->irq_gpio_flags = IRQF_TRIGGER_FALLING | IRQF_ONESHOT;
 	dev_info(&ts_data->client->dev, "irq:%d, flag:%x", ts_data->irq, pdata->irq_gpio_flags);
 	ret = request_threaded_irq(ts_data->irq, NULL, fts_irq_handler,
