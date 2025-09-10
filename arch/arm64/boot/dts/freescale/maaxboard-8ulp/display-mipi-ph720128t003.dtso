@@ -97,3 +97,13 @@
 &gt911{
 	status = "disabled";
 };
+
+/* For Avnet tft7201280 LCD display touchscreen */
+&st1633{
+	status = "disabled";
+};
+
+/* For Avnet tft8001280 LCD display touchscreen */
+&ili2132{
+	status = "disabled";
+};

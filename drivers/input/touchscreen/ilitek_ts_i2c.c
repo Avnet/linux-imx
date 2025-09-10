@@ -65,6 +65,8 @@ struct ilitek_ts_data {
 	s32				screen_min_x;
 	s32				screen_min_y;
 	s32				max_tp;
+	u32				lcd_resolution_x;
+	u32				lcd_resolution_y;
 };
 
 struct ilitek_protocol_map {
@@ -191,6 +193,9 @@ static int ilitek_process_and_report_v6(struct ilitek_ts_data *ts)
 
 		x = get_unaligned_le16(buf + i * packet_len + 2);
 		y = get_unaligned_le16(buf + i * packet_len + 4);
+
+		x = (x * ts->lcd_resolution_x) / ts->screen_max_x;
+		y = (y * ts->lcd_resolution_y) / ts->screen_max_y;
 
 		if (x > ts->screen_max_x || x < ts->screen_min_x ||
 		    y > ts->screen_max_y || y < ts->screen_min_y) {
@@ -415,7 +420,6 @@ static int ilitek_protocol_init(struct ilitek_ts_data *ts)
 	    ts->ptl.ver == BL_V1_6 ||
 	    ts->ptl.ver == BL_V1_7)
 		return -EINVAL;
-
 	return 0;
 }
 
@@ -579,6 +583,20 @@ static int ilitek_ts_i2c_probe(struct i2c_client *client)
 	if (error) {
 		dev_err(dev, "read tp info failed: %d", error);
 		return error;
+	}
+
+	error = of_property_read_u32(dev->of_node, "touchscreen-size-x", &ts->lcd_resolution_x);
+	if(error)
+	{
+		ts->lcd_resolution_x = ts->screen_max_x;
+		dev_warn(dev, "ts->lcd_resolution_x=%d", ts->lcd_resolution_x);
+	}
+
+	error = of_property_read_u32(dev->of_node, "touchscreen-size-y", &ts->lcd_resolution_y);
+	if(error)
+	{
+		ts->lcd_resolution_y = ts->screen_max_y;
+		dev_warn(dev, "ts->lcd_resolution_y=%d", ts->lcd_resolution_y);
 	}
 
 	error = ilitek_input_dev_init(dev, ts);

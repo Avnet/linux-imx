@@ -479,6 +479,36 @@
 		max-touch-number = <10>;
 		status = "disabled";
 	};
+
+	/* touch screen for avnet,tft7201280 */
+	st1633: st1633_ts@55 {
+		compatible = "sitronix,st1633";
+		reg = <0x55>;
+		interrupt-parent = <&rpmsg_gpioa>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&rpmsg_gpioa 5 GPIO_ACTIVE_HIGH>;
+		irq-gpios = <&rpmsg_gpioa 19 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		edge-failling-trigger;
+		status = "disabled";
+	};
+
+	/* touch screen for avnet,tft8001280 */
+	ili2132: ili2132_ts@41 {
+		compatible = "ilitek,ili2132";
+		reg = <0x41>;
+		interrupt-parent = <&rpmsg_gpioa>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&rpmsg_gpioa 5 GPIO_ACTIVE_LOW>;
+		irq-gpios = <&rpmsg_gpioa 19 GPIO_ACTIVE_HIGH>;
+		touchscreen-size-x = <800>;
+		touchscreen-size-y = <1280>;
+		//touchscreen-inverted-y;
+        //wakeup-source;
+		status = "disabled";
+	};
+
 };
 
 /*+---------------+
