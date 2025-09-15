@@ -36,7 +36,7 @@
 };
 
 &iomuxc1 {
-	pinctrl-0 = <&pinctrl_extspi5>;
+	pinctrl-0 = <&pinctrl_extgpio &pinctrl_exti2c4 &pinctrl_extspi5 &pinctrl_extuart4>;
 
 	pinctrl_extspi5: extspi5_grp {
 		fsl,pins = <
